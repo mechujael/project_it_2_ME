@@ -1,54 +1,60 @@
-import physics_engine as phys
+
 import pygame
-import random as rand
 import os
 import math
 from os import listdir
 from os.path import isfile, join
 
-
-pygame.display.set_caption("Platformer")
+pygame.init()
+pygame.display.set_caption("calm birds")
 
 
 #BASIC SETTINGS
-BG_COLOR=(255,255,255)
-WIDTH=1280
-HEIGHT=720
+WIDTH,HEIGHT=1280,720
 FPS=60
 PLAYER_VEL=5
 
-window=pygame.display.set_mode(WIDTH,HEIGHT)
+window=pygame.display.set_mode((WIDTH,HEIGHT))
 
 
-#SCREEN SETTINGS
+
+#SCREEN INITIALIZATION
 class SCREEN_ON():
     def __init__(self):
-        if pygame.display.get_active == "True":
-            pygame.init()
-            pygame.display.init
-        else:
-            pygame.display.quit
+        if pygame.display.get_active == True:
 
+            pygame.display.init
+
+def foreground(window):
+    sad=True
 
 #CONTROL OF TIME
-class TIME_RUN():
+def main(window):
+    clock=pygame.time.Clock()
 
-    i=0
-    while i<1:
-        if pygame.display.get_init =="True":
-            pass
-        else:
-            pygame.time.wait
     
-
-#FPS INFO
-i=0
-while i<1:
-    print(pygame.time.Clock.get_fps)
+    background=pygame.image.load(join("assets","bckgrnd","background_1_example.jpeg"))
+    window.blit(background,(0,0))
+    pygame.display.flip()
 
 
+    run=True
+    while run==True:
+        clock.tick(FPS)
+        pygame.display.get_active=True
+
+    
+        for event in pygame.event.get():
+            if event.type==pygame.QUIT:
+                run=False
+                break
+    pygame.quit()
+    quit()
 
 
+#calling the main function to start as soon, as the run of the code starts
+if __name__=="__main__":
+    main(window)
 
 
 
