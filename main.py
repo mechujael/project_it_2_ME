@@ -46,6 +46,8 @@ class Player(pygame.sprite.Sprite):
 
     def draw(self,window):
         pygame.draw.rect(window,self.COLOR,self.rect)
+
+
         
 
 #SCREEN INITIALIZATION
@@ -69,6 +71,9 @@ def player_move(player):
 
 #drawing
 def draw(window,player):
+
+    background=pygame.image.load(join("assets","bckgrnd","background_1_example.jpeg"))
+    window.blit(background,(0,0))
     player.draw(window)
     pygame.display.update()
 
@@ -78,9 +83,7 @@ def main(window):
 
     player = Player(100,100,50,50)
     
-    background=pygame.image.load(join("assets","bckgrnd","background_1_example.jpeg"))
-    window.blit(background,(0,0))
-    pygame.display.flip()
+
 
 
     run=True
