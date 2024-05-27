@@ -26,17 +26,16 @@ class Player(pygame.sprite.Sprite):
         self.direction="left"
     
     def move(self,dx,dy):
-
         self.rect.x+=dx
         self.rect.y+=dy
     
     def move_left(self,vel):
-        self.x_vel==-vel
+        self.x_vel=-vel
         if self.direction!="left":
             self.direction="left"
     
     def move_right(self,vel):
-        self.x_vel==vel
+        self.x_vel=vel
         if self.direction!="right":
             self.direction="right"
 
@@ -56,13 +55,12 @@ class SCREEN_ON():
 
             pygame.display.init
 
-def foreground(window):
-    sad=True
+
 
 #movement
 def player_move(player):
     key=pygame.key.get_pressed()
-
+    player.x_vel=0
     if key[pygame.K_LEFT]:
         player.move_left(PLAYER_VEL)
     if key[pygame.K_RIGHT]:
