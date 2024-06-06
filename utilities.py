@@ -1,4 +1,4 @@
-from pygame import image
+import pygame
 
 fonts ={}
 images={}
@@ -13,3 +13,8 @@ def convert_to_int(*args):
     return return_value
 
 #loading the image for optimization of rendering
+
+
+class collision():
+    
+

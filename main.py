@@ -21,7 +21,7 @@ class Player(pygame.sprite.Sprite):
     COLOR=(255,0,0)
     def __init__(self,x,y,width,height):
         self.rect=pygame.Rect(x,y,width,height)
-        super().__init__()
+        super(Player,self).__init__()
 
         self.x_vel=0
         self.y_vel=float()
@@ -101,30 +101,30 @@ class Block(pygame.sprite.Sprite):
 #collision
 
 
+background=pygame.image.load(join("assets","bckgrnd","background_1_example.jpeg"))
 #drawing
-def draw(window,player):
+def draw(window,player,):
 
-    background=pygame.image.load(join("assets","bckgrnd","background_1_example.jpeg"))
     window.blit(background,(0,0))
-
     player.draw(window)
     pygame.display.update()
 
+    
 #CONTROL OF TIME
 def main(window):
     clock=pygame.time.Clock()
     x=50
     y=50
     player = Player(100,100,50,50)
-    square=Block(color)
-    player_group=pygame.sprite.Group()
-    player_group.add(player)
-    squares=pygame.sprite.Group()
-    squares.add(square)
-    player_group.update()
-    squares.update()
-    if pygame.sprite.groupcollide(player_group,squares,0,0)==True:
-        square.fill((18, 0, 255))
+    #square=Block(color)
+    #player_group=pygame.sprite.Group()
+    #player_group.add(player)
+    #squares=pygame.sprite.Group()
+    #squares.add(square)
+    #player_group.update()
+    #squares.update()
+    #if pygame.sprite.groupcollide(player_group,squares,0,0)==True:
+    #    square.fill((18, 0, 255))
     
         
 
@@ -132,6 +132,7 @@ def main(window):
     run=True
     while run==True:
         clock.tick(FPS)
+        print(pygame.time.Clock.get_fps(clock))
         pygame.display.get_active=True
 
 
@@ -144,7 +145,7 @@ def main(window):
 
         grav(player)
         player_move(player)
-        squares.draw(window)
+        #squares.draw(window)
         draw(window,player)
         pygame.display.update()
     pygame.quit()
