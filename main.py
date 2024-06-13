@@ -20,12 +20,16 @@ window=pygame.display.set_mode((WIDTH,HEIGHT))
 class Player(pygame.sprite.Sprite):
     COLOR=(255,0,0)
     def __init__(self,x,y,width,height):
-        self.rect=pygame.Rect(x,y,width,height)
+        
         super(Player,self).__init__()
-
+        self.rect=pygame.Rect(x,y,width,height)
+        path = join("assets", "player","player_test.png")
+        self.image = pygame.image.load(path).convert()
+        self.surface = pygame.Surface((width, height),pygame.SRCALPHA, 32)
         self.x_vel=0
         self.y_vel=float()
         self.mask=None
+
         self.direction="left"
         self.weight=50
 
@@ -46,15 +50,24 @@ class Player(pygame.sprite.Sprite):
             self.direction="right"
     
     def move_up(self,vel):
-        self.y_vel=-vel
-    def move_down(self,vel):
-        self.y_vel+=vel
+        self.y_vel=-vel*2
+
+    def bottom(self):
+        self.y_vel*=-1
+    def top(self):
+        self.y_vel=0
 
     def char_loop(self,fps):
         self.move(self.x_vel, self.y_vel)
+        self.mask=pygame.mask.from_surface(self.surface)
+        self.mask_image=self.mask.to_surface()
 
-    def draw(self,window):
-        pygame.draw.rect(window,self.COLOR,self.rect)
+ #   def update(self):
+  #      self.rect = self.sprite.get_rect(topleft=(self.rect.x, self.rect.y))
+   #     self.mask = pygame.mask.from_surface(self.sprite)
+
+    def draw(self,window,offset_x):
+        window.blit(self.image,(self.rect.x -offset_x,self.rect.y))
 
 
         
@@ -69,7 +82,7 @@ class SCREEN_ON():
 #gravity
 def grav(player):
     if player.rect.y<HEIGHT-50:
-        player.y_vel+=player.weight/10
+        player.y_vel+=player.weight/50
 
     else:
   
@@ -77,52 +90,73 @@ def grav(player):
         player.rect.y=HEIGHT-50
 
 #movement
-def player_move(player):
+def player_move(player,objects,dy):
     key=pygame.key.get_pressed()
+    player.update()
     player.x_vel=0
+    map_bottom_coll=False
+    map_top_coll=False
+    for obj in objects:
+        if pygame.sprite.collide_mask(player,obj):
+            print(1)
+            if dy>0:
+                player.rect.bottom=obj.rect.top
+                map_top_coll=True
+            if dy<0:
+             player.rect.top=obj.rect.bottom
+             map_bottom_coll=True
 
-    
-    if key[pygame.K_LEFT]:
+
+
+    if key[pygame.K_LEFT]:# and not map_left_coll:
         player.move_left(PLAYER_VEL)
+    else:
+        map_left_coll=False
     if key[pygame.K_RIGHT]:
-        player.move_right(PLAYER_VEL)
-    if key[pygame.K_UP]:
+        player.move_right(PLAYER_VEL) #and not map_right_coll:
+    if key[pygame.K_UP] and not map_top_coll:
         player.move_up(PLAYER_VEL)
+    if map_top_coll==True:
+        player.top()
+        
+    if map_bottom_coll==True:
+        player.bottom()
+        map_bottom_coll=False
 
 
+
+
+
+#objects in the game
 
 def get_block(size,FileBlock):
     path = join("assets", "Terrain",FileBlock)
-    image = pygame.image.load(path).convert_alpha()
+    image = pygame.image.load(path).convert()
     surface = pygame.Surface((size, size),pygame.SRCALPHA, 32)
     rect = pygame.Rect(96, 0, size, size)
     surface.blit(image, (0,0), rect)
     return pygame.transform.scale2x(surface)
 
-#objects in the game
+
 class Object(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, name=None):
         super().__init__()
         self.rect = pygame.Rect(x, y, width, height)
-        self.image = pygame.Surface((width, height),pygame.SRCALPHA)
+        self.image = pygame.Surface((width, height),pygame.SRCALPHA,32)
         self.width = width
         self.height = height
         self.name = name
 
     def draw(self, win, offset_x):
         win.blit(self.image, (self.rect.x -offset_x, self.rect.y))
-        pygame.draw.rect(win,(255,0,0),self.rect)
-
-
 
 
 class Block(Object):
     def __init__(self, x, y, size,FileBlock):
         super().__init__(x, y, size,size)
         block = get_block(size,FileBlock)
-        self.image.blit(block, ((x, y)))
+        self.image.blit(block, ((0,0)))
         self.mask = pygame.mask.from_surface(self.image)
-
 
 
 
@@ -130,18 +164,21 @@ class Block(Object):
 #collision
 
 
-background=pygame.image.load(join("assets","bckgrnd","background_1_example.jpeg"))
 
+background=pygame.image.load(join("assets","bckgrnd","background_1_example.jpeg"))
 #drawing
 def draw(window,player,objects):
 
     window.blit(background,(0,0))
 
-    player.draw(window)
+    player.draw(window,0)
+
     for obj in objects:
         obj.draw(window,0)
-        print(obj.draw(window,0))
+    
     pygame.display.update()
+
+
 
 
 #CONTROL OF TIME
@@ -152,11 +189,11 @@ def main(window):
     player = Player(100,100,50,50)
 
     block_size=96
-    floor = [Block(i * block_size, HEIGHT - block_size, block_size,"block_2.png")
+    floor = [Block(i * block_size, HEIGHT - block_size, block_size,"block_1.png")
              for i in range(-WIDTH // block_size, (WIDTH * 2) // block_size)]
   
-    objects = [*floor,Block(0, HEIGHT - block_size * 2, block_size,"block_2.png"),
-               Block(block_size * 3, HEIGHT - block_size * 4, block_size,"block_2.png")]
+    objects = [*floor,Block(0, HEIGHT - block_size * 2, block_size,"block_1.png"),
+               Block(block_size * 3, HEIGHT - block_size * 4, block_size,"block_1.png")]
     run=True
     while run==True:
         clock.tick(FPS)
@@ -172,10 +209,9 @@ def main(window):
         player.char_loop(FPS)
 
         grav(player)
-        player_move(player)
+        player_move(player,objects,player.y_vel)
         #squares.draw(window)
         draw(window,player,objects)
-
         pygame.display.update()
     pygame.quit()
     quit()
