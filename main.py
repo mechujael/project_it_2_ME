@@ -97,7 +97,7 @@ def player_move(player,objects,dy):
     map_bottom_coll=False
     map_top_coll=False
     for obj in objects:
-        if pygame.sprite.collide_mask(player,obj):
+        if pygame.sprite.collide_rect(player,obj):
             print(1)
             if dy>0:
                 player.rect.bottom=obj.rect.top
@@ -186,7 +186,7 @@ def main(window):
     clock=pygame.time.Clock()
     x=50
     y=50
-    player = Player(100,100,50,50)
+    player = Player(100,100,125,125)
 
     block_size=96
     floor = [Block(i * block_size, HEIGHT - block_size, block_size,"block_1.png")
