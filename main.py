@@ -12,7 +12,7 @@ pygame.display.set_caption("calm birds")
 #BASIC SETTINGS
 WIDTH,HEIGHT=1280,720
 FPS=60
-PLAYER_VEL=10
+PLAYER_VEL=5
 color=(255,0,0)
 
 window=pygame.display.set_mode((WIDTH,HEIGHT))
@@ -27,7 +27,9 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.image.load(path).convert()
         self.surface = pygame.Surface((width, height),pygame.SRCALPHA, 32)
         self.x_vel=0
+        self.landed=bool()
         self.y_vel=float()
+        self.jump=0
         self.mask=None
 
         self.direction="left"
@@ -51,11 +53,23 @@ class Player(pygame.sprite.Sprite):
     
     def move_up(self,vel):
         self.y_vel=-vel*2
+        self.weight=50
+        if self.jump==0:
+            self.weight=25
+        elif self.jump==1:
+            self.weight=35
+        self.jump+=1
+
+ #       elif self.landed==False and self.jump<3:
+ #           self.y_vel=-vel*2
+ #           self.jump+=1
+
 
     def bottom(self):
-        self.y_vel*=-1
+        self.y_vel=0
     def top(self):
         self.y_vel=0
+        self.jump=0
 
     def char_loop(self,fps):
         self.move(self.x_vel, self.y_vel)
@@ -87,38 +101,52 @@ def grav(player):
         player.rect.y=HEIGHT-50
 
 #movement
-def player_move(player,objects,dy):
+def player_move(player,objects,dy,dx):
     key=pygame.key.get_pressed()
     player.update()
     player.x_vel=0
     map_bottom_coll=False
     map_top_coll=False
+    map_left_coll=False
+    map_right_coll=False
+    pressed=0
     for obj in objects:
+
         if pygame.sprite.collide_mask(player,obj):
-            if dy>0:
-                player.rect.bottom=obj.rect.top
+            if player.rect.y>=obj.rect.y-player.rect.height and player.rect.y<=obj.rect.y-player.rect.height/3:
+                player.rect.y=obj.rect.y-player.rect.height
                 map_top_coll=True
             if dy<0:
-             player.rect.top=obj.rect.bottom
-             map_bottom_coll=True
+                if player.rect.y<=obj.rect.y+obj.rect.height and player.rect.y>=obj.rect.y+obj.rect.height/3:
+                    player.rect.top=obj.rect.bottom
+                    map_bottom_coll=True
+        
+        for i in range(-1,2,2):
+            player.move(PLAYER_VEL*i/4,0)
+            if pygame.sprite.collide_mask(player, obj):
+                if i==-1:
+                    map_left_coll=True
+                else:
+                    map_right_coll=True
+            player.move(-PLAYER_VEL*i,0)
+            player.update      
 
 
-
-    if key[pygame.K_LEFT]:# and not map_left_coll:
+    if key[pygame.K_LEFT] and not map_left_coll:
         player.move_left(PLAYER_VEL)
-    else:
-        map_left_coll=False
-    if key[pygame.K_RIGHT]:
-        player.move_right(PLAYER_VEL) #and not map_right_coll:
-    if key[pygame.K_UP] and not map_top_coll:
-        player.move_up(PLAYER_VEL)
+
+    if key[pygame.K_RIGHT] and not map_right_coll:
+        player.move_right(PLAYER_VEL)
+
+ #   if key[pygame.K_UP] and not map_top_coll and not map_bottom_coll:
+#      if pygame.KEYDOWN and pressed==0:
+#            player.move_up(PLAYER_VEL)
+#            pressed=1
+
     if map_top_coll==True:
         player.top()
-        
     if map_bottom_coll==True:
-        player.bottom()
-        map_bottom_coll=False
-
+        player.y_vel*=-1
 
 
 
@@ -183,7 +211,7 @@ def draw(window,player,objects,offset_x):
 
     window.blit(background,(0,0))
 
-    player.draw(window,0)
+    player.draw(window,offset_x)
 
     for obj in objects:
         obj.draw(window,offset_x)
@@ -196,8 +224,6 @@ def draw(window,player,objects,offset_x):
 #CONTROL OF TIME
 def main(window):
     clock=pygame.time.Clock()
-    x=50
-    y=50
     player = Player(100,100,65,65)
 
     block_size=96
@@ -211,7 +237,7 @@ def main(window):
     main_objects=[]
 
 
-    objects = [*floor,Block(0, HEIGHT - block_size * 2, block_size,"block_1.png")]
+    objects = [*floor,Block(200, HEIGHT - block_size * 2, block_size,"block_1.png"),Block(500, HEIGHT - block_size * 4, block_size,"block_1.png")]
     run=True
     while run==True:
         clock.tick(FPS)
@@ -224,10 +250,13 @@ def main(window):
             if event.type==pygame.QUIT:
                 run=False
                 break
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP and player.jump < 2:
+                    player.move_up(PLAYER_VEL)
         player.char_loop(FPS)
 
         grav(player)
-        player_move(player,objects,player.y_vel)
+        player_move(player,objects,player.y_vel,player.x_vel)
         #squares.draw(window)
         draw(window,player,objects,offset_x)
         if ((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_vel > 0) or (
