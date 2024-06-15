@@ -17,14 +17,39 @@ color=(255,0,0)
 
 window=pygame.display.set_mode((WIDTH,HEIGHT))
 
+def flip_sprites(sprites):
+    return[pygame.transform.flip(sprite,True,False) for sprite in sprites]
+def load_spritesheets(width,height,dir1,dir2,direction):
+    path=join("assets",dir1,dir2)
+    images=[f for f in listdir(path) if isfile(join(path,f))]
+    all_sprites={}
+    for image in images:
+        sprite_sheet=pygame.image.load(join(path,image)).convert_alpha()
+
+        sprites=[]
+        for i in range(sprite_sheet.get_width()//width):
+            surface=pygame.Surface((width,height),pygame.SRCALPHA,32)
+            rect=pygame.Rect(i*width,0,width,height)
+            surface.blit(sprite_sheet,(0,0),rect)
+            sprites.append(surface)
+        
+        if direction:
+            all_sprites[image.replace(".png", "") +"_right"]=sprites
+            all_sprites[image.replace(".png", "") +"_left"]=flip_sprites(sprites)
+        else:
+            all_sprites[image.replace(".png", "")]=sprites
+    return all_sprites
+
+
 class Player(pygame.sprite.Sprite):
     COLOR=(255,0,0)
     def __init__(self,x,y,width,height):
         
         super(Player,self).__init__()
         self.rect=pygame.Rect(x,y,width,height)
-        path = join("assets", "player","player_test1.png")
-        self.image = pygame.image.load(path).convert()
+        path = join("graphics", "hog","hog1.png")
+        SPRITES = load_spritesheets("player", "hog", 65, 65, True)
+        self.image = pygame.image.load(path).convert_alpha()
         self.surface = pygame.Surface((width, height),pygame.SRCALPHA, 32)
         self.x_vel=0
         self.landed=bool()
@@ -32,10 +57,13 @@ class Player(pygame.sprite.Sprite):
         self.jump=0
         self.mask=None
 
-        self.direction="left"
+        self.direction="right"
         self.weight=50
 
-    
+    def sprite_animation(self):
+        if self.direction=="right":
+
+
     def move(self,dx,dy):
         self.rect.x+=dx
         self.rect.y+=dy
