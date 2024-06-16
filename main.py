@@ -2,6 +2,7 @@
 import pygame
 import os
 import math
+import random
 from os import listdir
 from os.path import isfile, join
 
@@ -60,6 +61,8 @@ class Player(pygame.sprite.Sprite):
         self.mask=None
         self.direction="left"
         self.weight=50
+        self.boost=0
+        self.hit=0
 
     def sprite_animation(self):
         sprite_sheet = "hog_idle5"
@@ -98,10 +101,16 @@ class Player(pygame.sprite.Sprite):
             self.weight=35
         self.jump+=1
 
- #       elif self.landed==False and self.jump<3:
- #           self.y_vel=-vel*2
- #           self.jump+=1
-
+    def hearts(self):
+        sprite_sheet="hearts"
+        if self.hit==0:
+            sprite_sheet_name = sprite_sheet + "_" + self.direction
+            sprites = self.SPRITES[sprite_sheet_name]
+            sprite_index = (self.animation_count //
+                        self.ANIMATION_DELAY) % len(sprites)
+            self.sprite = sprites[sprite_index]
+            self.animation_count += 1
+            self.update()           
 
     def bottom(self):
         self.y_vel=0
@@ -150,7 +159,6 @@ def player_move(player,objects,dy,dx):
     map_top_coll=False
     map_left_coll=False
     map_right_coll=False
-    pressed=0
     for obj in objects:
 
         if pygame.sprite.collide_mask(player,obj):
@@ -226,29 +234,66 @@ class Block(Object):
 
 
 #objects to bounce
-class Bouncer(pygame.sprite.Sprite):
+class Carrot(pygame.sprite.Sprite):
     COLOR=(255,0,0)
+    SPRITES = load_spritesheets( 65, 65,"carrot", "carrot_animation", True)
+
+    ANIMATION_DELAY=15
     def __init__(self,x,y,width,height):
         
-        super(Player,self).__init__()
+        super(Carrot,self).__init__()
         self.rect=pygame.Rect(x,y,width,height)
-        path = join("assets", "player","player_test1.png")
-        self.image = pygame.image.load(path).convert()
+        path = join("assets","carrot","Carrot.png")
+        self.image = pygame.image.load(path).convert_alpha()
         self.surface = pygame.Surface((width, height),pygame.SRCALPHA, 32)
-        self.x_vel=0
-        self.y_vel=float()
-        self.mask = pygame.mask.from_surface(self.image)
-        self.weight=50
+        self.direction="right"
+        self.animation_count=0
+        self.digging=0
+        self.mask=None
+        self.wait=0
+        self.boost_player=0
+
+    def sprite_animation(self):
+        sprite_sheet = "Carrot"
+        if self.digging != 0:
+            sprite_sheet = "carrot_digging"
+
+        sprite_sheet_name = sprite_sheet + "_" + self.direction
+        sprites = self.SPRITES[sprite_sheet_name]
+        sprite_index = (self.animation_count //
+                        self.ANIMATION_DELAY) % len(sprites)
+        self.sprite = sprites[sprite_index]
+        if sprite_sheet=="carrot_digging" and sprite_index==4:
+            pygame.sprite.Sprite.kill(self)
+            self.boost_player+=1
+        if self.animation_count // self.ANIMATION_DELAY > len(sprites):
+            self.animation_count = 0           
+
+        self.animation_count += 1
+        self.update()
+
+    def update(self):
+        #self.rect=self.sprite.get_rect(topleft=(self.rect.x,self.rect.y))
+        self.mask = pygame.mask.from_surface(self.sprite)
 
 
+    def draw(self,window,offset_x):
+        self.sprite_animation()
+        window.blit(self.sprite,(self.rect.x -offset_x,self.rect.y))
 
-#collision
-
+def carrot_interaction(player,carrot_group):
+    key=pygame.key.get_pressed()
+    for carrot in carrot_group:
+        if pygame.sprite.collide_mask(player,carrot) and key[pygame.K_e]:
+            carrot.digging=1
+        if carrot.boost_player==1:
+            player.boost+=1
+            carrot.boost_player=0
 
 
 background=pygame.image.load(join("assets","bckgrnd","background_1_example.jpeg"))
 #drawing
-def draw(window,player,objects,offset_x):
+def draw(window,player,objects,offset_x,carrots):
 
     window.blit(background,(0,0))
 
@@ -257,28 +302,40 @@ def draw(window,player,objects,offset_x):
     for obj in objects:
         obj.draw(window,offset_x)
     
+    for carrot in carrots:
+        carrot.draw(window,offset_x)
+    
+    
     pygame.display.update()
 
 
+block_size=96
+carrot_group=pygame.sprite.Group()
+for i in range(1,20,1):
+    carrot=Carrot(i*random.randint(i*100,i*200),HEIGHT-block_size*1.5,65,65)
+    if carrot_group.has()==False:
+        carrot_group.add(carrot)        
+    for carrot in carrot_group:
+        if pygame.sprite.spritecollideany(carrot,carrot_group,None)==None:
+            carrot_group.add(carrot)        
 
-
+   
 #CONTROL OF TIME
 def main(window):
     clock=pygame.time.Clock()
     player = Player(100,100,65,65)
+    offset_x=0
+    scroll_area_width=500
+
 
     block_size=96
     floor = [Block(i * block_size, HEIGHT - block_size, block_size,"block_1.png")
              for i in range(-WIDTH // block_size, (WIDTH * 2) // block_size)]
+    platforms= [Block(i * block_size, HEIGHT - block_size, block_size,"block_1.png")
+             for i in range(-WIDTH // block_size, (WIDTH * 2) // block_size)]
   
 
-    offset_x=0
-    scroll_area_width=500
-
-    main_objects=[]
-
-
-    objects = [*floor,Block(200, HEIGHT - block_size * 2, block_size,"block_1.png"),Block(500, HEIGHT - block_size * 4, block_size,"block_1.png")]
+    objects = [*floor,Block(200, HEIGHT - block_size * 2, block_size,"block_1.png"),Block(500, HEIGHT - block_size * 4, block_size,"block_1.png"),]
     run=True
     while run==True:
         clock.tick(FPS)
@@ -295,11 +352,10 @@ def main(window):
                 if event.key == pygame.K_UP and player.jump < 2:
                     player.move_up(PLAYER_VEL)
         player.char_loop(FPS)
-
         grav(player)
         player_move(player,objects,player.y_vel,player.x_vel)
-        #squares.draw(window)
-        draw(window,player,objects,offset_x)
+        draw(window,player,objects,offset_x,carrot_group)
+        carrot_interaction(player,carrot_group)
         if ((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_vel > 0) or (
                 (player.rect.left - offset_x <= scroll_area_width) and player.x_vel < 0):
             offset_x += player.x_vel
