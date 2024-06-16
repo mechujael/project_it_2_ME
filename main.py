@@ -43,26 +43,36 @@ def load_spritesheets(width,height,dir1,dir2,direction):
 
 class Player(pygame.sprite.Sprite):
     COLOR=(255,0,0)
+    SPRITES = load_spritesheets( 65, 65,"player", "hog", True)
+    ANIMATION_DELAY=7
     def __init__(self,x,y,width,height):
         
         super(Player,self).__init__()
         self.rect=pygame.Rect(x,y,width,height)
-        path = join("graphics", "hog","hog1.png")
-        SPRITES = load_spritesheets("player", "hog", 65, 65, True)
+        path = join("assets","player", "hog","hog1.png")
         self.image = pygame.image.load(path).convert_alpha()
         self.surface = pygame.Surface((width, height),pygame.SRCALPHA, 32)
+        self.animation_count=0
         self.x_vel=0
         self.landed=bool()
         self.y_vel=float()
         self.jump=0
         self.mask=None
-
-        self.direction="right"
+        self.direction="left"
         self.weight=50
 
     def sprite_animation(self):
-        if self.direction=="right":
+        sprite_sheet = "hog_idle5"
+        if self.x_vel != 0:
+            sprite_sheet = "hog_walking"
 
+        sprite_sheet_name = sprite_sheet + "_" + self.direction
+        sprites = self.SPRITES[sprite_sheet_name]
+        sprite_index = (self.animation_count //
+                        self.ANIMATION_DELAY) % len(sprites)
+        self.sprite = sprites[sprite_index]
+        self.animation_count += 1
+        self.update()
 
     def move(self,dx,dy):
         self.rect.x+=dx
@@ -101,12 +111,15 @@ class Player(pygame.sprite.Sprite):
 
     def char_loop(self,fps):
         self.move(self.x_vel, self.y_vel)
+        self.sprite_animation()
 
     def update(self):
-        self.mask = pygame.mask.from_surface(self.image)
+        #self.rect=self.sprite.get_rect(topleft=(self.rect.x,self.rect.y))
+        self.mask = pygame.mask.from_surface(self.sprite)
+
 
     def draw(self,window,offset_x):
-        window.blit(self.image,(self.rect.x -offset_x,self.rect.y))
+        window.blit(self.sprite,(self.rect.x -offset_x,self.rect.y))
 
 
         
