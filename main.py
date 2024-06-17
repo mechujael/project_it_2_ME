@@ -158,21 +158,15 @@ class Player(pygame.sprite.Sprite):
             self.damageWait-=1
         if self.boost!=0 and self.wait==0:
             if self.boost<=self.hit:
-                self.hit=self.hit-self.boost
+                self.hit-=self.boost
                 self.boost=0
                 self.wait=50
         else:
             self.boost=0
         if self.wait!=0:
             self.wait-=1
-            text = bigfont.render(str(self.wait*10), 13, (255, 0, 0))
-            dist = self.heart.get_rect()
-            textx_size = text.get_width()
-            pygame.draw.rect(window, (255, 255, 255), ((dist.x+dist.width, 0),(textx_size, 50)))
-
-            window.blit(text, (WIDTH / 2 - text.get_width() / 2,
-                       HEIGHT / 2 - text.get_height() / 2))
         self.hearts()
+        self.boost=0
 
 
     def update(self):
@@ -314,6 +308,11 @@ class ChillEnemy(pygame.sprite.Sprite):
 
     def sprite_animation(self):
         sprite_sheet = self.dir
+        if self.wait!=0:
+            if self.dir=="bird1walking":
+                sprite_sheet="bird1hit"
+            else:
+                sprite_sheet="bird2hit"
 
         sprite_sheet_name = sprite_sheet + "_" + self.direction
         sprites = self.SPRITES[sprite_sheet_name]
