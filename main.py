@@ -1,6 +1,7 @@
 
 import pygame
 import random
+import sys
 from os import listdir
 from os.path import isfile, join
 #import utilities
@@ -786,9 +787,43 @@ def main(window,difficulty):
     pygame.mixer.music.fadeout(1000)
     run=play_again()
 
+SCREEN = pygame.display.set_mode((1280, 720))
 
+class Button():
+	def __init__(self, image, pos, text_input, font, base_color, hovering_color):
+		self.image = image
+		self.x_pos = pos[0]
+		self.y_pos = pos[1]
+		self.font = font
+		self.base_color, self.hovering_color = base_color, hovering_color
+		self.text_input = text_input
+		self.text = self.font.render(self.text_input, True, self.base_color)
+		if self.image is None:
+			self.image = self.text
+		self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
+		self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
+
+	def update(self, screen):
+		if self.image is not None:
+			screen.blit(self.image, self.rect)
+		screen.blit(self.text, self.text_rect)
+
+	def checkForInput(self, position):
+		if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+			return True
+		return False
+
+	def changeColor(self, position):
+		if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+			self.text = self.font.render(self.text_input, True, self.hovering_color)
+		else:
+			self.text = self.font.render(self.text_input, True, self.base_color)
+
+def get_font(size): # Returns Press-Start-2P in the desired size
+    return pygame.font.Font("assets/mainmenu/font.ttf", size)
 
 def play_again():
+    """""
     text1 = bigfont.render('Play again?', 13, (0, 0, 0))
     text2 = bigfont.render('Main Menu', 13, (0, 0, 0))
     textx = WIDTH / 2 - text1.get_width() / 2
@@ -829,7 +864,34 @@ def play_again():
                         Back.backing=1
 
                         break
+    """
+    while True:
+        PLAY_AGAIN_POS = pygame.mouse.get_pos()
 
+        #Options button is DIFFICULTY in this case!!!!!!!!!!!
+        PLAY_AGAIN_BUTTON = Button(image=pygame.image.load("assets/mainmenu/Play Rect.png"), pos=(640, 350), 
+                            text_input="Play Again", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+        MAINMENU_BUTTON = Button(image=pygame.image.load("assets/mainmenu/Options Rect.png"), pos=(640, 500), 
+                            text_input="Main Menu", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+
+        #When mouse is over button (Najechanie na przycisk)
+        for button in [PLAY_AGAIN_BUTTON, MAINMENU_BUTTON]:
+            button.changeColor(PLAY_AGAIN_POS)
+            button.update(SCREEN)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                #clicked buttons
+                if PLAY_AGAIN_BUTTON.checkForInput(PLAY_AGAIN_POS):
+                    main(window)
+                if MAINMENU_BUTTON.checkForInput(PLAY_AGAIN_POS):
+                    Back.backing=1
+                    break
+
+        pygame.display.update()
 
 
 
