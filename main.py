@@ -13,8 +13,10 @@ pygame.display.set_caption("calm birds")
 #BASIC SETTINGS
 WIDTH,HEIGHT=1280,720
 FPS=60
-PLAYER_VEL=15
+PLAYER_VEL=5
 color=(255,0,0)
+bigfont = pygame.font.Font(None, 80)
+smallfont = pygame.font.Font(None, 45)
 
 window=pygame.display.set_mode((WIDTH,HEIGHT))
 
@@ -141,10 +143,12 @@ class Player(pygame.sprite.Sprite):
     def char_loop(self,fps):
         self.move(self.x_vel, self.y_vel)
         self.sprite_animation()
+        if self.rect.y>=HEIGHT:
+            self.game=0
 
         if self.hit_chill!=0 and self.damageWait==0:
             self.hit+=self.hit_chill
-            self.damageWait=100
+            self.damageWait=200
         if self.damageWait!=0:
             self.damageWait-=1
         if self.boost!=0 and self.wait==0:
@@ -184,14 +188,6 @@ def grav(player):
     if player.rect.y<HEIGHT-50:
         player.y_vel+=player.weight/50
 
-    else:
-  
-        player.y_vel=0
-        player.rect.y=HEIGHT-50
-
-
-def handle_move(player,objects,dy):
-    wait=0
 
                
 #movement
@@ -357,7 +353,67 @@ class ChillEnemy(pygame.sprite.Sprite):
     def draw(self,window,offset_x):
         window.blit(self.sprite,(self.rect.x -offset_x,self.rect.y))
 
+class FallingEnemy(pygame.sprite.Sprite):
+    COLOR=(255,0,0)
+    SPRITES = load_spritesheets( 65, 65,"Enemy", "fallingEnemy", True)
+    ANIMATION_DELAY=7
+    def __init__(self,x,y,width,height):
+        
+        super(FallingEnemy,self).__init__()
+        self.rect=pygame.Rect(x,y,width,height)
+        path = join("assets","Enemy","fallingEnemy","chilling.png")
+        self.image = pygame.image.load(path).convert_alpha()
+        self.surface = pygame.Surface((width, height),pygame.SRCALPHA, 32)
 
+        self.animation_count=0
+        self.x_vel=0
+        self.y_vel=random.randint(2,6)
+        self.mask=None
+        self.direction="left"
+        self.weight=70
+        self.hit=2
+        self.counter=0
+
+    def sprite_animation(self):
+        sprite_sheet = "idling"
+        if self.x_vel != 0:
+            sprite_sheet = "walking"
+
+        sprite_sheet_name = sprite_sheet + "_" + self.direction
+        sprites = self.SPRITES[sprite_sheet_name]
+        sprite_index = (self.animation_count //
+                        self.ANIMATION_DELAY) % len(sprites)
+        if self.counter==1:
+            pygame.sprite.Sprite.kill(self)
+        self.sprite = sprites[sprite_index]
+        self.animation_count += 1
+        self.update()
+
+    def move(self,dx,dy):
+        self.rect.x+=dx
+        self.rect.y+=dy
+        return
+
+    def char_loop(self):
+        self.move(self.x_vel, self.y_vel)
+        if self.x_vel>0:
+            if self.direction!="right":
+                self.direction="right"      
+        if self.x_vel<0:
+            if self.direction!="left":
+                self.direction="left"
+        self.sprite_animation()
+
+
+
+    def update(self):
+        #self.rect=self.sprite.get_rect(topleft=(self.rect.x,self.rect.y))
+        self.mask = pygame.mask.from_surface(self.sprite)
+
+
+
+    def draw(self,window,offset_x):
+        window.blit(self.sprite,(self.rect.x-offset_x,self.rect.y))
 #objects to bounce
 class Carrot(pygame.sprite.Sprite):
     COLOR=(255,0,0)
@@ -375,17 +431,22 @@ class Carrot(pygame.sprite.Sprite):
         self.digging=0
         self.mask=None
         self.wait=0
+        self.b=0
 
     def sprite_animation(self):
         sprite_sheet = "Carrot"
         if self.digging != 0:
-            sprite_sheet = "carrot_digging"
+            sprite_sheet = "carrot_digging"      
 
         sprite_sheet_name = sprite_sheet + "_" + self.direction
         sprites = self.SPRITES[sprite_sheet_name]
         sprite_index = (self.animation_count //
                         self.ANIMATION_DELAY) % len(sprites)
         self.sprite = sprites[sprite_index]
+        if sprite_sheet=="carrot_digging" and sprite_index==0 and self.b==0 or sprite_sheet=="carrot_digging" and sprite_index==1 and self.b==0:
+            sound1=pygame.mixer.Sound(join("assets","carrot","eating.mp3"))
+            sound1.play()
+            self.b=1
         if sprite_sheet=="carrot_digging" and sprite_index==4:
             pygame.sprite.Sprite.kill(self)
         if self.animation_count // self.ANIMATION_DELAY > len(sprites):
@@ -410,7 +471,7 @@ def carrot_interaction(player,carrot_group):
     boost_player=0
     key=pygame.key.get_pressed()
     for carrot in carrot_group:
-        if pygame.sprite.collide_mask(player,carrot) and key[pygame.K_e] and pygame.KEYDOWN:      
+        if pygame.sprite.collide_mask(player,carrot) and key[pygame.K_e] and pygame.KEYDOWN:  
             carrot.digging=1
             boost_player=1
 
@@ -419,19 +480,33 @@ def carrot_interaction(player,carrot_group):
         player.boost=1
         boost_player=0
 
-def chilling_enemy_movement(chillEnemy,player):
-    if pygame.sprite.collide_mask(chillEnemy,player):
-        player.hit_chill=1
-        player.char_loop(FPS)
-    else:
-        player.hit_chill=0
+#player taking damage from enemies
+def chilling_enemy_movement(chillEnemy_group,player,objects,fallingEnemy_group):
+    for falling in fallingEnemy_group:
+        if pygame.sprite.collide_mask(falling,player):
+            player.hit_chill=1
+            player.char_loop(FPS)
+        else:
+            player.hit_chill=0
+    for chill in chillEnemy_group:
+        if pygame.sprite.collide_mask(chill,player):
+            player.hit_chill=1
+            player.char_loop(FPS)
+        else:
+            player.hit_chill=0
+    for object in objects:
+        for falling in fallingEnemy_group:
+
+            if pygame.sprite.collide_mask(object,falling):
+                falling.counter=1
+    
 
 
 
 
 background=pygame.image.load(join("assets","bckgrnd","background_1_example.jpeg"))
 #drawing
-def draw(window,player,objects,offset_x,carrots,chillEnemy):
+def draw(window,player,objects,offset_x,carrots,chillEnemy,progress,fallingEnemy_group):
 
     window.blit(background,(0,0))
 
@@ -442,10 +517,21 @@ def draw(window,player,objects,offset_x,carrots,chillEnemy):
         carrot.draw(window,offset_x)
     
     player.draw(window,offset_x)
-    chillEnemy.draw(window,offset_x)
+    for chill in chillEnemy:
+        chill.draw(window,offset_x)
+    for falling in fallingEnemy_group:
+        falling.draw(window,offset_x)
+
+    text = smallfont.render(("progress: "+str(round(progress,1)))+"%", 13, (0, 0, 0))
+
+    window.blit(text, (WIDTH / 2 - text.get_width() / 2,0)) 
+      
     pygame.display.update()
 
 
+
+FallingEnemy_group=pygame.sprite.Group() 
+ChillEnemy_group=pygame.sprite.Group()    
 block_size=96
 class Level1():
     def __init__(self):
@@ -453,8 +539,19 @@ class Level1():
         self.x_distribution=self.block_size*5
 
         pygame.mixer.music.load(join("assets","music","AngryBirdsThemeSongDubstepRemix_TerenceJayMusic.mp3"))
-        pygame.mixer.music.play()
-  
+        pygame.mixer.music.play(-1)
+        self.delay=int(0)
+
+
+    def enemies(self,player):
+        chance=1
+        k=random.randint(int(player.rect.x),int(player.rect.x+WIDTH))    
+        fallingEnemy=FallingEnemy(k,0,65,65)
+        guess=random.randint(1,20)
+        if guess<=chance:  
+            FallingEnemy_group.add(fallingEnemy)  
+        return
+
     def objects(self):
         floor = [Block(i * self.block_size, HEIGHT - self.block_size, self.block_size,"block_1.png")
              for i in range(0, (WIDTH * 5) // self.block_size)]
@@ -521,18 +618,28 @@ class Level1():
             guess=random.randint(1,10)
             if guess<=chance1:  
                 carrot_group.add(carrot)  
+        
+        #stationary enemies
+        ChillEnemy_group.add(ChillEnemy(5,HEIGHT-block_size-65,65,65,2))
+        ChillEnemy_group.add(ChillEnemy(12*block_size,HEIGHT-block_size*3-65,65,65,5))
+        ChillEnemy_group.add(ChillEnemy(18*block_size,HEIGHT-block_size*5-65,65,65,2))
         return objects
+    
+    def length(self):
+        length=WIDTH*5
+        return length
 
-     
 
+       
 #CONTROL OF TIME
 def main(window):
     clock=pygame.time.Clock()
     player = Player(100,100,65,65)
     offset_x=0
     scroll_area_width=500
+    progress=0
 
-    chillEnemy=ChillEnemy(5,HEIGHT-block_size-65,65,65,2)
+
     level1= Level1()
     objects=level1.objects()
     run=True
@@ -541,44 +648,89 @@ def main(window):
         #print(pygame.time.Clock.get_fps(clock))
         pygame.display.get_active=True
 
-        if player.game==0:
-            pygame.sprite.Sprite.kill(player)
-            font=pygame.font.Font("Times New Roman",15)
-            gameover = pygame.font.Font.render(font,"Press R to Respawn", False, (255, 255, 255))
-            rect = gameover.get_rect()
-            rect.center = window.get_rect().center
-            window.blit(gameover, rect)
-        key=pygame.key.get_pressed()
-        if player.game==0 and key[pygame.K_r]:
-            main(window)
-                      
+                 
     
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
-                run=False
-                break
+                pygame.display.quit()
+                pygame.quit()
+                quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP and player.jump < 2:
                     player.move_up(PLAYER_VEL)
-            
+
+        if player.game==0:
+            objects.clear()
+            for chill in ChillEnemy_group:
+                chill.kill()
+            player.kill()
+            carrot_group.empty()
+            run=False
+
+        progr=(player.rect.x/(level1.length()-100))*100
+        if progress<=progr:
+            progress=progr
+        else:
+            pass
         player.char_loop(FPS)
-        chillEnemy.char_loop()
+        level1.enemies(player)
+
         grav(player)
         player_move(player,objects,player.y_vel)
-        chilling_enemy_movement(chillEnemy,player)
-        draw(window,player,objects,offset_x,carrot_group,chillEnemy)
+        for falling in FallingEnemy_group:
+            falling.char_loop()
+        for chill in ChillEnemy_group:
+            chill.char_loop()
+        chilling_enemy_movement(ChillEnemy_group,player,objects,FallingEnemy_group)
+        draw(window,player,objects,offset_x,carrot_group,ChillEnemy_group,progress,FallingEnemy_group)
         carrot_interaction(player,carrot_group)
         if ((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_vel > 0) or (
                 (player.rect.left - offset_x <= scroll_area_width) and player.x_vel < 0):
+            
             offset_x += player.x_vel
- 
-    pygame.quit()
-    quit()
+    window.blit(background,(0,0))
+    pygame.mixer.music.fadeout(1000)
+    run=play_again()
+
+
+
+def play_again():
+    text = bigfont.render('Play again?', 13, (0, 0, 0))
+    textx = WIDTH / 2 - text.get_width() / 2
+    texty = HEIGHT / 2 - text.get_height() / 2
+    textx_size = text.get_width()
+    texty_size = text.get_height()
+    pygame.draw.rect(window, (255, 255, 255), ((textx - 5, texty - 5),
+                                               (textx_size + 10, texty_size +
+                                                10)))
+
+    window.blit(text, (WIDTH / 2 - text.get_width() / 2,
+                       HEIGHT / 2 - text.get_height() / 2))
+
+    clock = pygame.time.Clock()
+    pygame.display.flip()
+    in_main_menu = True
+    while in_main_menu:
+        clock.tick(50)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                in_main_menu = False
+                pygame.display.quit()
+                pygame.quit()
+                quit()
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                x, y = event.pos
+                if x >= textx - 5 and x <= textx + textx_size + 5:
+                    if y >= texty - 5 and y <= texty + texty_size + 5:
+                        in_main_menu=False
+                        break
+
+
 
 
 
 
 #calling the main function to start as soon, as the run of the code starts
-if __name__=="__main__":
+while __name__=="__main__":
     main(window)
 
