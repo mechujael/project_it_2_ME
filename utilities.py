@@ -145,6 +145,8 @@ def main_menu():
 
         MENU_MOUSE_POS = pygame.mouse.get_pos()
 
+        
+
         #Menu, Title on the top!
         MENU_TEXT = get_font(100).render("CALM BIRDS", True, "#16c780")
         MENU_RECT = MENU_TEXT.get_rect(center=(640, 100))
