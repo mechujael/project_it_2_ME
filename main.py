@@ -12,7 +12,7 @@ pygame.display.set_caption("calm birds")
 #BASIC SETTINGS
 WIDTH,HEIGHT=1280,720
 FPS=60
-PLAYER_VEL=5
+PLAYER_VEL=7
 color=(255,0,0)
 bigfont = pygame.font.Font(None, 80)
 smallfont = pygame.font.Font(None, 45)
