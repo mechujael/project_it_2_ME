@@ -163,7 +163,7 @@ def main_menu():
         
 
         #Menu, Title on the top!
-        MENU_TEXT = get_font(100).render("CALM BIRDS", True, "#16c780")
+        MENU_TEXT = get_font(100).render("CALM BIRDS", True, "#a018b5")
         MENU_RECT = MENU_TEXT.get_rect(center=(640, 100))
 
         #Options button is DIFFICULTY in this case!!!!!!!!!!!
