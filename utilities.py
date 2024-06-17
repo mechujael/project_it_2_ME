@@ -1,20 +1,23 @@
 import pygame
 
-fonts ={}
-images={}
+# list of vowels
 
-#Getting integer values
-def convert_to_int(*args):
-    return_value=[]
+vowels = ['a', 'e', 'i', 'o', 'u']
 
-    for arg in args:
-        return_value.append(int(arg))
-
-    return return_value
-
-#loading the image for optimization of rendering
+vowels_iter = iter(vowels)
 
 
-class collision():
+
+print(next(vowels_iter)) # 'a'
+
+print(next(vowels_iter)) # 'e'
+
+print(next(vowels_iter)) # 'i'
+
+print(next(vowels_iter)) # 'o'
+
+print(next(vowels_iter)) # 'u'
+
+
     
 
