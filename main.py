@@ -3,7 +3,7 @@ import pygame
 import random
 from os import listdir
 from os.path import isfile, join
-import utilities
+#import utilities
 
 pygame.init()
 pygame.display.set_caption("calm birds")
@@ -12,7 +12,7 @@ pygame.display.set_caption("calm birds")
 #BASIC SETTINGS
 WIDTH,HEIGHT=1280,720
 FPS=60
-PLAYER_VEL=5
+PLAYER_VEL=7
 color=(255,0,0)
 bigfont = pygame.font.Font(None, 80)
 smallfont = pygame.font.Font(None, 45)
@@ -719,16 +719,21 @@ class Level1():
         return length
 
 
-       
+class Back():
+    def __init__(self):
+        self.backing=0
+
+
+
+back=Back()
 #CONTROL OF TIME
-def main(window):
+def main(window,difficulty):
     clock=pygame.time.Clock()
     player = Player(50,150,65,65)
     offset_x=0
     scroll_area_width=500
     progress=0
-    difficulty=utilities.difficulty.diflev
-
+    difficulty=1#utilities.difficulty.diflev
     level1= Level1()
     objects=level1.objects(difficulty)
     run=True
@@ -822,7 +827,7 @@ def play_again():
                     elif y >= texty2 and y <= texty2+100:
                         print(1)
                         in_main_menu=False
-                        utilities.main_menu()
+                        Back.backing=1
 
                         break
 

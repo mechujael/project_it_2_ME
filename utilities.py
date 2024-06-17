@@ -73,6 +73,8 @@ def play():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
                     main_menu()
+                if PLAY_LEVELONE.checkForInput(PLAY_MOUSE_POS):
+                    main.main(SCREEN,difficulty.diflev)
 
         pygame.display.update()
 
@@ -135,7 +137,7 @@ class play():
 class Difficulty():
     def __init__(self):
         super(Difficulty,self).__init__()        
-        self.diflev=2
+        self.diflev=1
         self.diff=1
 
 
@@ -245,6 +247,8 @@ def main_menu():
 
 main_menu()
 
-
+while True:
+     if main.back.backing==1:
+          main_menu()
 
 
