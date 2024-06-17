@@ -53,7 +53,7 @@ def play():
 class Difficulty():
     def __init__(self):
         super(Difficulty,self).__init__()        
-        self.diflev=1
+        self.diflev=2
         self.diff=1
 
 
