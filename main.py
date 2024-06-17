@@ -315,7 +315,7 @@ class ChillEnemy(pygame.sprite.Sprite):
     def sprite_animation(self):
         sprite_sheet = "idling"
         if self.x_vel != 0:
-            sprite_sheet = "walking"
+            sprite_sheet = "bird1walking"
 
         sprite_sheet_name = sprite_sheet + "_" + self.direction
         sprites = self.SPRITES[sprite_sheet_name]
