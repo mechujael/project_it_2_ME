@@ -3,6 +3,7 @@ import pygame
 import random
 from os import listdir
 from os.path import isfile, join
+import utilities
 
 pygame.init()
 pygame.display.set_caption("calm birds")
@@ -75,7 +76,7 @@ class Player(pygame.sprite.Sprite):
         self.weight=50
 
         self.boost=0
-        self.hit=2
+        self.hit=0
         self.hit_chill=0
 
         self.game=1
@@ -380,7 +381,7 @@ class FallingEnemy(pygame.sprite.Sprite):
         self.surface = pygame.Surface((width, height),pygame.SRCALPHA, 32)
 
         self.animation_count=0
-        self.x_vel=0
+        self.x_vel=random.randint(-2,2)
         self.y_vel=random.randint(2,6)
         self.mask=None
         self.direction="left"
@@ -567,8 +568,14 @@ class Level1():
         self.delay=int(0)
 
 
-    def enemies(self,player):
-        chance=1
+    def enemies(self,player,difficulty):
+
+        if difficulty==1:
+            chance=1
+        if difficulty==2:
+            chance=4
+        if difficulty==3:
+            chance=7
         k=random.randint(int(player.rect.x),int(player.rect.x+WIDTH))    
         fallingEnemy=FallingEnemy(k,0,65,65)
         guess=random.randint(1,100)
@@ -576,7 +583,7 @@ class Level1():
             FallingEnemy_group.add(fallingEnemy)  
         return
 
-    def objects(self):
+    def objects(self,difficulty):
         floor = [Block(i * self.block_size, HEIGHT - self.block_size, self.block_size,"block_1.png")
              for i in range(0, (WIDTH * 5) // self.block_size)]
         
@@ -659,7 +666,12 @@ class Level1():
         objects = [*floor,*walls,*steps,*platforms,Block(200, HEIGHT - self.block_size * 2, self.block_size,"block_1.png"),Block(500, HEIGHT - self.block_size * 4, self.block_size,"block_1.png")]
 
         #carrot distribution system
-        chance=2
+        if difficulty==1:
+            chance=10
+        if difficulty==2:
+            chance=7
+        if difficulty==3:
+            chance=3       
         for obj in floor:
             if obj.rect.x>=self.x_distribution:
                 for step in steps:
@@ -674,7 +686,7 @@ class Level1():
                                 break
                         break   
                 carrot=Carrot(obj.rect.x+random.randint(0,self.block_size//3),height-32,65,65)
-                guess=random.randint(1,10)
+                guess=random.randint(1,50)
                 if guess<=chance:  
                     carrot_group.add(carrot)  
         for obj in platforms:
@@ -715,10 +727,10 @@ def main(window):
     offset_x=0
     scroll_area_width=500
     progress=0
-
+    difficulty=utilities.difficulty.diflev
 
     level1= Level1()
-    objects=level1.objects()
+    objects=level1.objects(difficulty)
     run=True
     while run==True:
         clock.tick(FPS)
@@ -751,7 +763,7 @@ def main(window):
             pass
 
         player.char_loop(FPS)
-        level1.enemies(player)
+        level1.enemies(player,difficulty)
 
         grav(player)
         player_move(player,objects,player.y_vel)
@@ -773,18 +785,24 @@ def main(window):
 
 
 def play_again():
-    text = bigfont.render('Play again?', 13, (0, 0, 0))
-    textx = WIDTH / 2 - text.get_width() / 2
-    texty = HEIGHT / 2 - text.get_height() / 2
-    textx_size = text.get_width()
-    texty_size = text.get_height()
+    text1 = bigfont.render('Play again?', 13, (0, 0, 0))
+    text2 = bigfont.render('Main Menu', 13, (0, 0, 0))
+    textx = WIDTH / 2 - text1.get_width() / 2
+    texty = HEIGHT / 2 - text1.get_height() / 2
+    texty2 = HEIGHT / 2 - text2.get_height() / 2  +100
+    textx_size = text1.get_width()
+    texty_size = text1.get_height()
+    texty2_size=text2.get_height()
     pygame.draw.rect(window, (255, 255, 255), ((textx - 5, texty - 5),
                                                (textx_size + 10, texty_size +
                                                 10)))
-
-    window.blit(text, (WIDTH / 2 - text.get_width() / 2,
-                       HEIGHT / 2 - text.get_height() / 2))
-
+    pygame.draw.rect(window, (255, 255, 255), ((textx - 5, texty2-5),
+                                               (textx_size + 10, texty2_size)))
+  
+    window.blit(text1, (WIDTH / 2 - text1.get_width() / 2,
+                       HEIGHT / 2 - text1.get_height() / 2))
+    window.blit(text2, (WIDTH / 2 - text1.get_width() / 2,HEIGHT / 2 -text2.get_height()/2+100))  
+    
     clock = pygame.time.Clock()
     pygame.display.flip()
     in_main_menu = True
@@ -801,6 +819,11 @@ def play_again():
                 if x >= textx - 5 and x <= textx + textx_size + 5:
                     if y >= texty - 5 and y <= texty + texty_size + 5:
                         in_main_menu=False
+                    elif y >= texty2 and y <= texty2+100:
+                        print(1)
+                        in_main_menu=False
+                        utilities.main_menu()
+
                         break
 
 
