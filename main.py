@@ -18,6 +18,8 @@ color=(255,0,0)
 bigfont = pygame.font.Font(None, 80)
 smallfont = pygame.font.Font(None, 45)
 
+background=pygame.image.load(join("assets","bckgrnd","bg1.png"))
+
 window=pygame.display.set_mode((WIDTH,HEIGHT))
 
 def flip_sprites(sprites):
@@ -148,23 +150,30 @@ class Player(pygame.sprite.Sprite):
 
         if self.hit_chill!=0 and self.damageWait==0:
             self.hit+=self.hit_chill
-            self.damageWait=200
+            self.damageWait=100
         if self.damageWait!=0:
             self.damageWait-=1
         if self.boost!=0 and self.wait==0:
             if self.boost<=self.hit:
                 self.hit=self.hit-self.boost
                 self.boost=0
-                self.wait=100
+                self.wait=50
         else:
             self.boost=0
         if self.wait!=0:
             self.wait-=1
+            text = bigfont.render(str(self.wait//10), 13, (0, 0, 0))
+            dist = self.heart.get_rect()
+            textx_size = text.get_width()
+            pygame.draw.rect(window, (255, 255, 255), ((dist.x+dist.width, 0),
+                                               (textx_size -200, 0)))
+
+            window.blit(text, (WIDTH / 2 - text.get_width() / 2,
+                       HEIGHT / 2 - text.get_height() / 2))
         self.hearts()
 
 
     def update(self):
-        #self.rect=self.sprite.get_rect(topleft=(self.rect.x,self.rect.y))
         self.mask = pygame.mask.from_surface(self.sprite)
 
 
@@ -345,7 +354,6 @@ class ChillEnemy(pygame.sprite.Sprite):
 
 
     def update(self):
-        #self.rect=self.sprite.get_rect(topleft=(self.rect.x,self.rect.y))
         self.mask = pygame.mask.from_surface(self.sprite)
 
 
@@ -375,7 +383,7 @@ class FallingEnemy(pygame.sprite.Sprite):
         self.counter=0
 
     def sprite_animation(self):
-        sprite_sheet = "idling"
+        sprite_sheet = "walking"
         if self.x_vel != 0:
             sprite_sheet = "walking"
 
@@ -504,7 +512,7 @@ def chilling_enemy_movement(chillEnemy_group,player,objects,fallingEnemy_group):
 
 
 
-background=pygame.image.load(join("assets","bckgrnd","background_1_example.jpeg"))
+
 #drawing
 def draw(window,player,objects,offset_x,carrots,chillEnemy,progress,fallingEnemy_group):
 
