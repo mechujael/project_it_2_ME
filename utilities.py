@@ -1,23 +1,184 @@
-import pygame
+import pygame, sys
 
-# list of vowels
+pygame.init()
+diflev=1
+#button
+class Button():
+	def __init__(self, image, pos, text_input, font, base_color, hovering_color):
+		self.image = image
+		self.x_pos = pos[0]
+		self.y_pos = pos[1]
+		self.font = font
+		self.base_color, self.hovering_color = base_color, hovering_color
+		self.text_input = text_input
+		self.text = self.font.render(self.text_input, True, self.base_color)
+		if self.image is None:
+			self.image = self.text
+		self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
+		self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
 
-vowels = ['a', 'e', 'i', 'o', 'u']
+	def update(self, screen):
+		if self.image is not None:
+			screen.blit(self.image, self.rect)
+		screen.blit(self.text, self.text_rect)
 
-vowels_iter = iter(vowels)
+	def checkForInput(self, position):
+		if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+			return True
+		return False
+
+	def changeColor(self, position):
+		if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+			self.text = self.font.render(self.text_input, True, self.hovering_color)
+		else:
+			self.text = self.font.render(self.text_input, True, self.base_color)
+
+
+SCREEN = pygame.display.set_mode((1280, 720))
+pygame.display.set_caption("Menu")
+
+BG = pygame.image.load("assets/mainmenu/Background.png")
+
+def get_font(size): # Returns Press-Start-2P in the desired size
+    return pygame.font.Font("assets/mainmenu/font.ttf", size)
+
+def play():
+    while True:
+        PLAY_MOUSE_POS = pygame.mouse.get_pos()
+
+        SCREEN.fill("black")
+
+        PLAY_TEXT = get_font(45).render("This is the PLAY screen.", True, "White")
+        PLAY_RECT = PLAY_TEXT.get_rect(center=(640, 260))
+        SCREEN.blit(PLAY_TEXT, PLAY_RECT)
+
+        PLAY_BACK = Button(image=None, pos=(640, 460), 
+                            text_input="BACK", font=get_font(75), base_color="White", hovering_color="Green")
+
+        PLAY_BACK.changeColor(PLAY_MOUSE_POS)
+        PLAY_BACK.update(SCREEN)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
+                    main_menu()
+
+        pygame.display.update()
+
+
+#difficulty level 
+def dl(diflev):
+    while True:
+        OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
+
+        SCREEN.fill("antiquewhite")
+
+        OPTIONS_TEXT = get_font(45).render("Set Your Difficulty Level", True, "Black")
+        OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(640, 60))
+        SCREEN.blit(OPTIONS_TEXT, OPTIONS_RECT)
+        
+        #setting diffculty level
+        
+        if diflev==1:
+            OPTIONS_EASY = Button(image=None, pos=(640, 160),
+							    text_input="Easy", font=get_font(45), base_color="Palegreen", hovering_color="Palegreen")
+            OPTIONS_MEDIUM = Button(image=None, pos=(640, 260),
+		    				    text_input="Medium", font=get_font(45), base_color="Black", hovering_color="Gold")
+            OPTIONS_HARD = Button(image=None, pos=(640, 360),
+			    				text_input="Hard", font=get_font(45), base_color="Black", hovering_color="Tomato")
+        if diflev==2:
+            OPTIONS_EASY = Button(image=None, pos=(640, 160),
+		    					text_input="Easy", font=get_font(45), base_color="Black", hovering_color="Palegreen")
+            OPTIONS_MEDIUM = Button(image=None, pos=(640, 260),
+			    				text_input="Medium", font=get_font(45), base_color="Gold", hovering_color="Gold")
+            OPTIONS_HARD = Button(image=None, pos=(640, 360),
+			    				text_input="Hard", font=get_font(45), base_color="Black", hovering_color="Tomato")
+        if diflev==3:
+            OPTIONS_EASY = Button(image=None, pos=(640, 160),
+		    					text_input="Easy", font=get_font(45), base_color="Black", hovering_color="Palegreen")
+            OPTIONS_MEDIUM = Button(image=None, pos=(640, 260),
+			    				text_input="Medium", font=get_font(45), base_color="Black", hovering_color="Gold")
+            OPTIONS_HARD = Button(image=None, pos=(640, 360),
+			    				text_input="Hard", font=get_font(45), base_color="Tomato", hovering_color="Tomato")
+        
+        OPTIONS_BACK = Button(image=None, pos=(640, 560), 
+                            text_input="BACK", font=get_font(75), base_color="Black", hovering_color="Green")
+
+        OPTIONS_BACK.changeColor(OPTIONS_MOUSE_POS)
+        OPTIONS_BACK.update(SCREEN)
+        OPTIONS_EASY.changeColor(OPTIONS_MOUSE_POS)
+        OPTIONS_EASY.update(SCREEN)
+        OPTIONS_MEDIUM.changeColor(OPTIONS_MOUSE_POS)
+        OPTIONS_MEDIUM.update(SCREEN)
+        OPTIONS_HARD.changeColor(OPTIONS_MOUSE_POS)
+        OPTIONS_HARD.update(SCREEN)
 
 
 
-print(next(vowels_iter)) # 'a'
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
+                    main_menu()
+                if OPTIONS_EASY.checkForInput(OPTIONS_MOUSE_POS):
+                    diflev=1
+                    main_menu()
+                if OPTIONS_MEDIUM.checkForInput(OPTIONS_MOUSE_POS):
+                    diflev=2
+                    main_menu()    
+                if OPTIONS_HARD.checkForInput(OPTIONS_MOUSE_POS):
+                    diflev=3
+                    main_menu()
+        pygame.display.update()
+    return diflev  
 
-print(next(vowels_iter)) # 'e'
+def main_menu():
+    while True:
+        SCREEN.blit(BG, (0, 0))
 
-print(next(vowels_iter)) # 'i'
+        MENU_MOUSE_POS = pygame.mouse.get_pos()
 
-print(next(vowels_iter)) # 'o'
+        #Menu, Title on the top!
+        MENU_TEXT = get_font(100).render("CALM BIRDS", True, "#16c780")
+        MENU_RECT = MENU_TEXT.get_rect(center=(640, 100))
 
-print(next(vowels_iter)) # 'u'
+        #Options button is DIFFICULTY in this case!!!!!!!!!!!
+        PLAY_BUTTON = Button(image=pygame.image.load("assets/mainmenu/Play Rect.png"), pos=(640, 250), 
+                            text_input="PLAY", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+        OPTIONS_BUTTON = Button(image=pygame.image.load("assets/mainmenu/Options Rect.png"), pos=(640, 400), 
+                            text_input="DIFFICULTY", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+        QUIT_BUTTON = Button(image=pygame.image.load("assets/mainmenu/Quit Rect.png"), pos=(640, 550), 
+                            text_input="QUIT", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+
+        SCREEN.blit(MENU_TEXT, MENU_RECT)
+        #When mouse is over button (Najechanie na przycisk)
+        for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON]:
+            button.changeColor(MENU_MOUSE_POS)
+            button.update(SCREEN)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                #clicked buttons
+                if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    play()
+                if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    dl(diflev)
+                if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    pygame.quit()
+                    sys.exit()
+
+        pygame.display.update()
+
+main_menu()
 
 
-    
+
 
