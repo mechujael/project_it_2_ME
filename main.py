@@ -826,47 +826,7 @@ def get_font(size): # Returns Press-Start-2P in the desired size
     return pygame.font.Font("assets/mainmenu/font.ttf", size)
 
 def play_again(difficulty):
-    """""
-    text1 = bigfont.render('Play again?', 13, (0, 0, 0))
-    text2 = bigfont.render('Main Menu', 13, (0, 0, 0))
-    textx = WIDTH / 2 - text1.get_width() / 2
-    texty = HEIGHT / 2 - text1.get_height() / 2
-    texty2 = HEIGHT / 2 - text2.get_height() / 2  +100
-    textx_size = text1.get_width()
-    texty_size = text1.get_height()
-    texty2_size=text2.get_height()
-    pygame.draw.rect(window, (255, 255, 255), ((textx - 5, texty - 5),
-                                               (textx_size + 10, texty_size +
-                                                10)))
-    pygame.draw.rect(window, (255, 255, 255), ((textx - 5, texty2-5),
-                                               (textx_size + 10, texty2_size)))
-  
-    window.blit(text1, (WIDTH / 2 - text1.get_width() / 2,
-                       HEIGHT / 2 - text1.get_height() / 2))
-    window.blit(text2, (WIDTH / 2 - text1.get_width() / 2,HEIGHT / 2 -text2.get_height()/2+100))  
-    
-    clock = pygame.time.Clock()
-    pygame.display.flip()
-    in_main_menu = True
-    while in_main_menu:
-        clock.tick(50)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                in_main_menu = False
-                pygame.display.quit()
-                pygame.quit()
-                quit()
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                x, y = event.pos
-                if x >= textx - 5 and x <= textx + textx_size + 5:
-                    if y >= texty - 5 and y <= texty + texty_size + 5:
-                        in_main_menu=False
-                    elif y >= texty2 and y <= texty2+100:
-                        in_main_menu=False
-                        Back.backing=1
 
-                        break
-    """
     run=True
     while run:
         PLAY_AGAIN_POS = pygame.mouse.get_pos()
