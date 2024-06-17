@@ -1,7 +1,5 @@
 
 import pygame
-import os
-import math
 import random
 from os import listdir
 from os.path import isfile, join
@@ -13,7 +11,7 @@ pygame.display.set_caption("calm birds")
 #BASIC SETTINGS
 WIDTH,HEIGHT=1280,720
 FPS=60
-PLAYER_VEL=6
+PLAYER_VEL=15
 color=(255,0,0)
 bigfont = pygame.font.Font(None, 80)
 smallfont = pygame.font.Font(None, 45)
@@ -290,7 +288,7 @@ class ChillEnemy(pygame.sprite.Sprite):
     COLOR=(255,0,0)
     SPRITES = load_spritesheets( 65, 65,"Enemy", "chill_enemy", True)
     ANIMATION_DELAY=7
-    def __init__(self,x,y,width,height,distance):
+    def __init__(self,x,y,width,height,distance,dir1):
         
         super(ChillEnemy,self).__init__()
         self.rect=pygame.Rect(x,y,width,height)
@@ -299,7 +297,7 @@ class ChillEnemy(pygame.sprite.Sprite):
         self.surface = pygame.Surface((width, height),pygame.SRCALPHA, 32)
 
         self.animation_count=0
-        self.x_vel=1
+        self.x_vel=random.randint(1,3)
         self.y_vel=float()
         self.mask=None
         self.direction="left"
@@ -310,11 +308,10 @@ class ChillEnemy(pygame.sprite.Sprite):
         self.wait=0
         self.distance=(distance-1)*block_size+(block_size-self.rect.width)
         self.travel=0.1
+        self.dir=dir1
 
     def sprite_animation(self):
-        sprite_sheet = "idling"
-        if self.x_vel != 0:
-            sprite_sheet = "bird1walking"
+        sprite_sheet = self.dir
 
         sprite_sheet_name = sprite_sheet + "_" + self.direction
         sprites = self.SPRITES[sprite_sheet_name]
@@ -368,7 +365,7 @@ class FallingEnemy(pygame.sprite.Sprite):
         
         super(FallingEnemy,self).__init__()
         self.rect=pygame.Rect(x,y,width,height)
-        path = join("assets","Enemy","fallingEnemy","chilling.png")
+        path = join("assets","Enemy","fallingEnemy","bird3walking.png")
         self.image = pygame.image.load(path).convert_alpha()
         self.surface = pygame.Surface((width, height),pygame.SRCALPHA, 32)
 
@@ -382,9 +379,9 @@ class FallingEnemy(pygame.sprite.Sprite):
         self.counter=0
 
     def sprite_animation(self):
-        sprite_sheet = "walking"
+        sprite_sheet = "bird3walking"
         if self.x_vel != 0:
-            sprite_sheet = "walking"
+            sprite_sheet = "bird3walking"
 
         sprite_sheet_name = sprite_sheet + "_" + self.direction
         sprites = self.SPRITES[sprite_sheet_name]
@@ -529,9 +526,13 @@ def draw(window,player,objects,offset_x,carrots,chillEnemy,progress,fallingEnemy
     for falling in fallingEnemy_group:
         falling.draw(window,offset_x)
 
-    text = smallfont.render(("progress: "+str(round(progress,1)))+"%", 13, (0, 0, 0))
+#    text = smallfont.render(("progress: "+str(round(progress,1)))+"%", 13, (0, 0, 0))
+#    window.blit(text, (WIDTH / 2 - text.get_width() / 2,0))
+    maxwidth=350
+    pygame.draw.rect(window, (0,0,0), pygame.Rect(WIDTH/2-maxwidth,0,maxwidth,35))        
+    pygame.draw.rect(window, (255,255,255), pygame.Rect(WIDTH/2-(maxwidth*progress),0,maxwidth*progress,35))    
 
-    window.blit(text, (WIDTH / 2 - text.get_width() / 2,0)) 
+ 
       
     pygame.display.update()
 
@@ -544,9 +545,9 @@ class Level1():
     def __init__(self):
         self.block_size=96
         self.x_distribution=self.block_size*5
-
         pygame.mixer.music.load(join("assets","music","AngryBirdsThemeSongDubstepRemix_TerenceJayMusic.mp3"))
         pygame.mixer.music.play(-1)
+        pygame.mixer.music.set_volume(0.4)
         self.delay=int(0)
 
 
@@ -673,13 +674,16 @@ class Level1():
                 carrot_group.add(carrot)  
         
         #stationary enemies
-        ChillEnemy_group.add(ChillEnemy(5,HEIGHT-block_size-65,65,65,2))
-        ChillEnemy_group.add(ChillEnemy(12*block_size,HEIGHT-block_size*3-65,65,65,5))
-        ChillEnemy_group.add(ChillEnemy(18*block_size,HEIGHT-block_size*5-65,65,65,2))
-        ChillEnemy_group.add(ChillEnemy(40*block_size,HEIGHT-block_size*5-65,65,65,3))
-        ChillEnemy_group.add(ChillEnemy(45*block_size,HEIGHT-block_size*5-65,65,65,2))
-        ChillEnemy_group.add(ChillEnemy(51*block_size,HEIGHT-block_size*2-65,65,65,2))
-        ChillEnemy_group.add(ChillEnemy(53*block_size,HEIGHT-block_size*5-65,65,65,5))
+        dir=["bird1walking","bird2walking"]
+        ChillEnemy_group.add(ChillEnemy(12*block_size,HEIGHT-block_size*3-65,65,65,5,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(18*block_size,HEIGHT-block_size*5-65,65,65,2,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(40*block_size,HEIGHT-block_size*5-65,65,65,4,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(45*block_size,HEIGHT-block_size*5-65,65,65,2,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(51*block_size,HEIGHT-block_size*2-65,65,65,2,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(53*block_size,HEIGHT-block_size*5-65,65,65,5,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(27*block_size,HEIGHT-block_size*3-65,65,65,3,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(20*block_size,HEIGHT-block_size*1-65,65,65,5,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(3*block_size,HEIGHT-block_size*1-65,65,65,8,dir[random.randint(0,1)]))
         return objects
     
     def length(self):
@@ -691,7 +695,7 @@ class Level1():
 #CONTROL OF TIME
 def main(window):
     clock=pygame.time.Clock()
-    player = Player(100,100,65,65)
+    player = Player(50,150,65,65)
     offset_x=0
     scroll_area_width=500
     progress=0
@@ -724,11 +728,12 @@ def main(window):
             carrot_group.empty()
             run=False
 
-        progr=(player.rect.x/(level1.length()-100))*100
+        progr=(player.rect.x/(level1.length()-65*2))
         if progress<=progr:
             progress=progr
         else:
             pass
+
         player.char_loop(FPS)
         level1.enemies(player)
 
