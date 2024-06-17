@@ -1,5 +1,6 @@
 import pygame, sys
 import main
+from os.path import join
 
 pygame.init()
 #button
@@ -78,60 +79,6 @@ def play():
 
         pygame.display.update()
 
-"""""
-class play():
-    def __init__(self):
-        super(Difficulty,self).__init__()        
-        self.lev=2
-        self.level=1
-    def play(self):
-        while True:
-            PLAY_MOUSE_POS = pygame.mouse.get_pos()
-
-            SCREEN.fill("Indigo")
-
-            PLAY_TEXT = get_font(45).render("Choose Level", True, "Ivory")
-            PLAY_RECT = PLAY_TEXT.get_rect(center=(640, 60))
-            SCREEN.blit(PLAY_TEXT, PLAY_RECT)
-
-            for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                    
-                        pygame.quit()
-                        sys.exit()
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        if PLAY_BACK.checkForInput(OPTIONS_MOUSE_POS):
-                            main_menu()
-                        if PLAY_LEVELONE.checkForInput(OPTIONS_MOUSE_POS):
-                            self.level=1
-                        if PLAY_LEVELTWO.checkForInput(OPTIONS_MOUSE_POS):
-                            self.level=2
-                        
-                self.level=self.lev
-                if self.level==1:
-                    PLAY_LEVELONE = Button(image=None, pos=(640, 160),
-                                    text_input="Easy", font=get_font(45), base_color="Ivory", hovering_color="darkcyan")
-                    PLAY_LEVELTWO = Button(image=None, pos=(640, 260),
-                                    text_input="Medium", font=get_font(45), base_color="Ivory", hovering_color="darkcyan")
-                if self.diff==2:
-                    PLAY_LEVELONE = Button(image=None, pos=(640, 160),
-                                    text_input="Easy", font=get_font(45), base_color="Ivory", hovering_color="darkcyan")
-                    PLAY_LEVELTWO = Button(image=None, pos=(640, 260),
-                                    text_input="Medium", font=get_font(45), base_color="Ivory", hovering_color="darkcyan")
-                    
-            
-                PLAY_BACK = Button(image=None, pos=(640, 560), 
-                                text_input="BACK", font=get_font(75), base_color="Ivory", hovering_color="darkcyan")
-
-                PLAY_BACK.changeColor(OPTIONS_MOUSE_POS)
-                PLAY_BACK.update(SCREEN)
-                PLAY_LEVELONE.changeColor(OPTIONS_MOUSE_POS)
-                PLAY_LEVELONE.update(SCREEN)
-                PLAY_LEVELTWO.changeColor(OPTIONS_MOUSE_POS)
-                PLAY_LEVELTWO.update(SCREEN)
-            
-                pygame.display.update() 
-"""""
 
 #difficulty level 
 class Difficulty():
@@ -205,7 +152,9 @@ class Difficulty():
 
 difficulty=Difficulty()
 def main_menu():
-
+    pygame.mixer.music.load(join("assets","music","AngryBirdsThemeSongDubstepRemix_TerenceJayMusic.mp3"))
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.set_volume(0.4)
     while True:
         SCREEN.blit(BG, (0, 0))
 
@@ -248,7 +197,7 @@ def main_menu():
 
 main_menu()
 
-while True:
+while main.back.backing==0:
      if main.back.backing==1:
           main_menu()
 

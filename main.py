@@ -12,7 +12,7 @@ pygame.display.set_caption("calm birds")
 #BASIC SETTINGS
 WIDTH,HEIGHT=1280,720
 FPS=60
-PLAYER_VEL=7
+PLAYER_VEL=5
 color=(255,0,0)
 bigfont = pygame.font.Font(None, 80)
 smallfont = pygame.font.Font(None, 45)
@@ -24,6 +24,7 @@ window=pygame.display.set_mode((WIDTH,HEIGHT))
 def flip_sprites(sprites):
     return[pygame.transform.flip(sprite,True,False) for sprite in sprites]
 def load_spritesheets(width,height,dir1,dir2,direction):
+    print(1)
     path=join("assets",dir1,dir2)
     images=[f for f in listdir(path) if isfile(join(path,f))]
     all_sprites={}
@@ -148,6 +149,8 @@ class Player(pygame.sprite.Sprite):
             self.game=0
 
         if self.hit_chill!=0 and self.damageWait==0:
+            sound=pygame.mixer.Sound(join("assets","music","Minecraft_Damage_-_Sound_Effect.mp3"))
+            sound.play()
             self.hit+=self.hit_chill
             self.damageWait=100
         if self.damageWait!=0:
@@ -161,10 +164,10 @@ class Player(pygame.sprite.Sprite):
             self.boost=0
         if self.wait!=0:
             self.wait-=1
-            text = bigfont.render(str(self.wait//10), 13, (0, 0, 0))
+            text = bigfont.render(str(self.wait*10), 13, (255, 0, 0))
             dist = self.heart.get_rect()
             textx_size = text.get_width()
-            pygame.draw.rect(window, (255, 255, 255), ((dist.x+dist.width, 0),(textx_size -200, 0)))
+            pygame.draw.rect(window, (255, 255, 255), ((dist.x+dist.width, 0),(textx_size, 50)))
 
             window.blit(text, (WIDTH / 2 - text.get_width() / 2,
                        HEIGHT / 2 - text.get_height() / 2))
@@ -562,7 +565,7 @@ class Level1():
     def __init__(self):
         self.block_size=96
         self.x_distribution=self.block_size*5
-        pygame.mixer.music.load(join("assets","music","AngryBirdsThemeSongDubstepRemix_TerenceJayMusic.mp3"))
+        pygame.mixer.music.load(join("assets","music","bad_piggies_drip.mp3"))
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(0.4)
         self.delay=int(0)
@@ -667,11 +670,11 @@ class Level1():
 
         #carrot distribution system
         if difficulty==1:
-            chance=10
+            chance=5
         if difficulty==2:
-            chance=7
+            chance=3
         if difficulty==3:
-            chance=3       
+            chance=1      
         for obj in floor:
             if obj.rect.x>=self.x_distribution:
                 for step in steps:
@@ -824,7 +827,6 @@ def play_again():
                     if y >= texty - 5 and y <= texty + texty_size + 5:
                         in_main_menu=False
                     elif y >= texty2 and y <= texty2+100:
-                        print(1)
                         in_main_menu=False
                         Back.backing=1
 
