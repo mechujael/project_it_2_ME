@@ -788,7 +788,7 @@ def main(window,difficulty):
             offset_x += player.x_vel
     window.blit(background,(0,0))
     pygame.mixer.music.fadeout(1000)
-    run=play_again()
+    run=play_again(difficulty)
 
 SCREEN = pygame.display.set_mode((1280, 720))
 
@@ -825,7 +825,7 @@ class Button():
 def get_font(size): # Returns Press-Start-2P in the desired size
     return pygame.font.Font("assets/mainmenu/font.ttf", size)
 
-def play_again():
+def play_again(difficulty):
     """""
     text1 = bigfont.render('Play again?', 13, (0, 0, 0))
     text2 = bigfont.render('Main Menu', 13, (0, 0, 0))
@@ -867,7 +867,8 @@ def play_again():
 
                         break
     """
-    while True:
+    run=True
+    while run:
         PLAY_AGAIN_POS = pygame.mouse.get_pos()
 
         #Options button is DIFFICULTY in this case!!!!!!!!!!!
@@ -888,9 +889,11 @@ def play_again():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 #clicked buttons
                 if PLAY_AGAIN_BUTTON.checkForInput(PLAY_AGAIN_POS):
-                    main(window)
+                    main(window,difficulty)
+                    break
                 if MAINMENU_BUTTON.checkForInput(PLAY_AGAIN_POS):
                     Back.backing=1
+                    run=False
                     break
 
         pygame.display.update()

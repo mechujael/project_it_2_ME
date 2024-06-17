@@ -199,6 +199,8 @@ main_menu()
 
 while main.back.backing==0:
      if main.back.backing==1:
+          main.back.backing=0
           main_menu()
+
 
 
