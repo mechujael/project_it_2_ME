@@ -11,7 +11,11 @@ pygame.display.set_caption("calm birds")
 #BASIC SETTINGS
 WIDTH,HEIGHT=1280,720
 FPS=60
-PLAYER_VEL=7
+<<<<<<< HEAD
+PLAYER_VEL=5
+=======
+PLAYER_VEL=5
+>>>>>>> 9e9d192e2c3989edaef8837109affb21c8b2c0a1
 color=(255,0,0)
 bigfont = pygame.font.Font(None, 80)
 smallfont = pygame.font.Font(None, 45)
@@ -236,10 +240,6 @@ def player_move(player,objects,dy):
     if key[pygame.K_RIGHT] and not map_right_coll:
         player.move_right(PLAYER_VEL)
 
- #   if key[pygame.K_UP] and not map_top_coll and not map_bottom_coll:
-#      if pygame.KEYDOWN and pressed==0:
-#            player.move_up(PLAYER_VEL)
-#            pressed=1
 
     if map_top_coll==True:
         player.top()
@@ -295,17 +295,18 @@ class ChillEnemy(pygame.sprite.Sprite):
         path = join("assets","Enemy", "chilling.png")
         self.image = pygame.image.load(path).convert_alpha()
         self.surface = pygame.Surface((width, height),pygame.SRCALPHA, 32)
-
+        self.rand=random.randint(1,3)
         self.animation_count=0
-        self.x_vel=random.randint(1,3)
+        self.x_vel=self.rand
         self.y_vel=float()
         self.mask=None
         self.direction="left"
         self.weight=70
         self.boost=0
-        self.hit=2
+        self.hit=0
         self.game=1
         self.wait=0
+        self.cooldown=0
         self.distance=(distance-1)*block_size+(block_size-self.rect.width)
         self.travel=0.1
         self.dir=dir1
@@ -345,6 +346,19 @@ class ChillEnemy(pygame.sprite.Sprite):
             self.x_vel*=-1
         if self.travel<=0:
             self.x_vel*=-1
+        if self.hit==1 and self.wait==0 and self.cooldown==0:
+            self.x_vel=0
+            self.hit=0
+            self.wait=150
+            self.cooldown=1
+        elif self.hit==0 and self.wait!=0 or self.hit==1 and self.wait!=0:
+            self.hit=0
+            self.wait-=1
+            self.x_vel=0
+        elif self.hit==0 and self.wait==0 and self.cooldown==1 or self.hit==1 and self.wait==0 and self.cooldown==1:
+            self.x_vel=self.rand
+            self.cooldown=0
+
         self.sprite_animation()
 
 
@@ -494,8 +508,15 @@ def chilling_enemy_movement(chillEnemy_group,player,objects,fallingEnemy_group):
             player.hit_chill=0
     for chill in chillEnemy_group:
         if pygame.sprite.collide_mask(chill,player):
-            player.hit_chill=1
-            player.char_loop(FPS)
+            if player.rect.bottom>=chill.rect.bottom-20:
+                player.hit_chill=1
+                break
+            else:
+                player.y_vel*=-1
+                chill.hit=1
+                player.hit_chill=0
+            
+            player.update()
         else:
             player.hit_chill=0
     for object in objects:
@@ -526,14 +547,13 @@ def draw(window,player,objects,offset_x,carrots,chillEnemy,progress,fallingEnemy
     for falling in fallingEnemy_group:
         falling.draw(window,offset_x)
 
-#    text = smallfont.render(("progress: "+str(round(progress,1)))+"%", 13, (0, 0, 0))
-#    window.blit(text, (WIDTH / 2 - text.get_width() / 2,0))
-    maxwidth=350
-    pygame.draw.rect(window, (0,0,0), pygame.Rect(WIDTH/2-maxwidth,0,maxwidth,35))        
-    pygame.draw.rect(window, (255,255,255), pygame.Rect(WIDTH/2-(maxwidth*progress),0,maxwidth*progress,35))    
 
- 
-      
+    maxwidth=350
+    pygame.draw.rect(window, (0,0,0), pygame.Rect(WIDTH/2-maxwidth/2-3,0,maxwidth+6,41))  
+    pygame.draw.rect(window, (255,0,0), pygame.Rect(WIDTH/2-maxwidth/2,3,maxwidth,35))        
+    pygame.draw.rect(window, (127,255,0), pygame.Rect(WIDTH/2-maxwidth/2,3,maxwidth*progress,35)) 
+    text = smallfont.render(("PROGRESS "), 13, (0, 0, 0))
+    window.blit(text, (WIDTH / 2 - text.get_width() / 2,39))        
     pygame.display.update()
 
 
