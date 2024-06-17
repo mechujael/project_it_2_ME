@@ -13,7 +13,7 @@ pygame.display.set_caption("calm birds")
 #BASIC SETTINGS
 WIDTH,HEIGHT=1280,720
 FPS=60
-PLAYER_VEL=5
+PLAYER_VEL=6
 color=(255,0,0)
 bigfont = pygame.font.Font(None, 80)
 smallfont = pygame.font.Font(None, 45)
@@ -165,8 +165,7 @@ class Player(pygame.sprite.Sprite):
             text = bigfont.render(str(self.wait//10), 13, (0, 0, 0))
             dist = self.heart.get_rect()
             textx_size = text.get_width()
-            pygame.draw.rect(window, (255, 255, 255), ((dist.x+dist.width, 0),
-                                               (textx_size -200, 0)))
+            pygame.draw.rect(window, (255, 255, 255), ((dist.x+dist.width, 0),(textx_size -200, 0)))
 
             window.blit(text, (WIDTH / 2 - text.get_width() / 2,
                        HEIGHT / 2 - text.get_height() / 2))
@@ -555,7 +554,7 @@ class Level1():
         chance=1
         k=random.randint(int(player.rect.x),int(player.rect.x+WIDTH))    
         fallingEnemy=FallingEnemy(k,0,65,65)
-        guess=random.randint(1,20)
+        guess=random.randint(1,100)
         if guess<=chance:  
             FallingEnemy_group.add(fallingEnemy)  
         return
@@ -563,11 +562,23 @@ class Level1():
     def objects(self):
         floor = [Block(i * self.block_size, HEIGHT - self.block_size, self.block_size,"block_1.png")
              for i in range(0, (WIDTH * 5) // self.block_size)]
+        
+
+
         steps=[Block(self.block_size*25+i*self.block_size, HEIGHT - self.block_size * 2, self.block_size,"block_1.png")
                for i in range(0,5)]
+        for k in range(45,47,1):
+            steps.append(Block(k * self.block_size, HEIGHT - self.block_size * 4, self.block_size,"wall_1.png"))
+            steps.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"wall_1.png")) 
+        for k in range(4,8,1):
+            steps.append(Block(49 * self.block_size, HEIGHT - self.block_size * k, self.block_size,"wall_1.png"))
+               
         for i in range(0,3):
             steps.append(Block(self.block_size*35+i*self.block_size, HEIGHT - self.block_size * 2, self.block_size,"block_1.png"))
-        walls=[]
+
+
+
+
         platforms= []
         for k in range(12,17,1):
             platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"block_1.png"))
@@ -586,8 +597,42 @@ class Level1():
             for obj in floor:
                 if obj.rect.x==k*self.block_size:
                     floor.remove(obj)
-        
+        for k in range(37,42,1):
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"block_1.png"))
+            for obj in floor:
+                if obj.rect.x==k*self.block_size:
+                    floor.remove(obj)
+                  
+        for k in range(40,44,1):
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"block_1.png"))
+            for obj in floor:
+                if obj.rect.x==k*self.block_size:
+                    floor.remove(obj)
+           
+        for k in range(45,47,1):
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"block_1.png"))
+            for obj in floor:
+                if obj.rect.x==45*self.block_size:
+                    floor.remove(obj)       
+        platforms.append(Block(49 * self.block_size, HEIGHT - self.block_size * 8, self.block_size,"block_1.png"))
+        for i in range(49,51,1):
+            for obj in floor:
+                if obj.rect.x==i*self.block_size:
+                    floor.remove(obj)          
+        for k in range(51,53,1):
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 2, self.block_size,"block_1.png"))
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 6, self.block_size,"block_1.png"))           
+            for obj in floor:
+                if obj.rect.x==k*self.block_size:
+                    floor.remove(obj)                  
+        platforms.append(Block(50 * self.block_size, HEIGHT - self.block_size * 4, self.block_size,"block_1.png"))
+        for k in range(53,58):
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"block_1.png"))           
+            for obj in floor:
+                if obj.rect.x==k*self.block_size:
+                    floor.remove(obj)              
 
+        walls=[]
         for k in range(0,HEIGHT//self.block_size+1):
             for i in range(-6,0,1):
                 walls.append(Block(i * self.block_size, k*self.block_size, self.block_size,"wall_1.png"))
@@ -631,6 +676,10 @@ class Level1():
         ChillEnemy_group.add(ChillEnemy(5,HEIGHT-block_size-65,65,65,2))
         ChillEnemy_group.add(ChillEnemy(12*block_size,HEIGHT-block_size*3-65,65,65,5))
         ChillEnemy_group.add(ChillEnemy(18*block_size,HEIGHT-block_size*5-65,65,65,2))
+        ChillEnemy_group.add(ChillEnemy(40*block_size,HEIGHT-block_size*5-65,65,65,3))
+        ChillEnemy_group.add(ChillEnemy(45*block_size,HEIGHT-block_size*5-65,65,65,2))
+        ChillEnemy_group.add(ChillEnemy(51*block_size,HEIGHT-block_size*2-65,65,65,2))
+        ChillEnemy_group.add(ChillEnemy(53*block_size,HEIGHT-block_size*5-65,65,65,5))
         return objects
     
     def length(self):
