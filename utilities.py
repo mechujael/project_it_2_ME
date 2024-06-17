@@ -1,7 +1,6 @@
 import pygame, sys
 
 pygame.init()
-diflev=1
 #button
 class Button():
 	def __init__(self, image, pos, text_input, font, base_color, hovering_color):
@@ -70,73 +69,76 @@ def play():
 
 
 #difficulty level 
-def dl(diflev):
-    while True:
-        OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
+class Difficulty():
+    def __init__(self):
+        super(Difficulty,self).__init__()        
+        self.diflev=1
+        self.diff=1
 
-        SCREEN.fill("antiquewhite")
 
-        OPTIONS_TEXT = get_font(45).render("Set Your Difficulty Level", True, "Black")
-        OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(640, 60))
-        SCREEN.blit(OPTIONS_TEXT, OPTIONS_RECT)
+    def dl(self):
+        while True:
+            OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
+
+            SCREEN.fill("antiquewhite")
+
+            OPTIONS_TEXT = get_font(45).render("Set Your Difficulty Level", True, "Black")
+            OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(640, 60))
+            SCREEN.blit(OPTIONS_TEXT, OPTIONS_RECT)
         
-        #setting diffculty level
-        
-        if diflev==1:
-            OPTIONS_EASY = Button(image=None, pos=(640, 160),
+            #setting diffculty level
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
+                        main_menu()
+                    if OPTIONS_EASY.checkForInput(OPTIONS_MOUSE_POS):
+                        self.diflev=1
+                    if OPTIONS_MEDIUM.checkForInput(OPTIONS_MOUSE_POS):
+                        self.diflev=2
+                    if OPTIONS_HARD.checkForInput(OPTIONS_MOUSE_POS):
+                        self.diflev=3
+            self.diff=self.diflev
+            if self.diff==1:
+                OPTIONS_EASY = Button(image=None, pos=(640, 160),
 							    text_input="Easy", font=get_font(45), base_color="Palegreen", hovering_color="Palegreen")
-            OPTIONS_MEDIUM = Button(image=None, pos=(640, 260),
+                OPTIONS_MEDIUM = Button(image=None, pos=(640, 260),
 		    				    text_input="Medium", font=get_font(45), base_color="Black", hovering_color="Gold")
-            OPTIONS_HARD = Button(image=None, pos=(640, 360),
+                OPTIONS_HARD = Button(image=None, pos=(640, 360),
 			    				text_input="Hard", font=get_font(45), base_color="Black", hovering_color="Tomato")
-        if diflev==2:
-            OPTIONS_EASY = Button(image=None, pos=(640, 160),
+            if self.diff==2:
+                OPTIONS_EASY = Button(image=None, pos=(640, 160),
 		    					text_input="Easy", font=get_font(45), base_color="Black", hovering_color="Palegreen")
-            OPTIONS_MEDIUM = Button(image=None, pos=(640, 260),
+                OPTIONS_MEDIUM = Button(image=None, pos=(640, 260),
 			    				text_input="Medium", font=get_font(45), base_color="Gold", hovering_color="Gold")
-            OPTIONS_HARD = Button(image=None, pos=(640, 360),
+                OPTIONS_HARD = Button(image=None, pos=(640, 360),
 			    				text_input="Hard", font=get_font(45), base_color="Black", hovering_color="Tomato")
-        if diflev==3:
-            OPTIONS_EASY = Button(image=None, pos=(640, 160),
+            if self.diff==3:
+                OPTIONS_EASY = Button(image=None, pos=(640, 160),
 		    					text_input="Easy", font=get_font(45), base_color="Black", hovering_color="Palegreen")
-            OPTIONS_MEDIUM = Button(image=None, pos=(640, 260),
+                OPTIONS_MEDIUM = Button(image=None, pos=(640, 260),
 			    				text_input="Medium", font=get_font(45), base_color="Black", hovering_color="Gold")
-            OPTIONS_HARD = Button(image=None, pos=(640, 360),
+                OPTIONS_HARD = Button(image=None, pos=(640, 360),
 			    				text_input="Hard", font=get_font(45), base_color="Tomato", hovering_color="Tomato")
         
-        OPTIONS_BACK = Button(image=None, pos=(640, 560), 
+            OPTIONS_BACK = Button(image=None, pos=(640, 560), 
                             text_input="BACK", font=get_font(75), base_color="Black", hovering_color="Green")
 
-        OPTIONS_BACK.changeColor(OPTIONS_MOUSE_POS)
-        OPTIONS_BACK.update(SCREEN)
-        OPTIONS_EASY.changeColor(OPTIONS_MOUSE_POS)
-        OPTIONS_EASY.update(SCREEN)
-        OPTIONS_MEDIUM.changeColor(OPTIONS_MOUSE_POS)
-        OPTIONS_MEDIUM.update(SCREEN)
-        OPTIONS_HARD.changeColor(OPTIONS_MOUSE_POS)
-        OPTIONS_HARD.update(SCREEN)
+            OPTIONS_BACK.changeColor(OPTIONS_MOUSE_POS)
+            OPTIONS_BACK.update(SCREEN)
+            OPTIONS_EASY.changeColor(OPTIONS_MOUSE_POS)
+            OPTIONS_EASY.update(SCREEN)
+            OPTIONS_MEDIUM.changeColor(OPTIONS_MOUSE_POS)
+            OPTIONS_MEDIUM.update(SCREEN)
+            OPTIONS_HARD.changeColor(OPTIONS_MOUSE_POS)
+            OPTIONS_HARD.update(SCREEN)
+            pygame.display.update() 
 
-
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
-                    main_menu()
-                if OPTIONS_EASY.checkForInput(OPTIONS_MOUSE_POS):
-                    diflev=1
-                    main_menu()
-                if OPTIONS_MEDIUM.checkForInput(OPTIONS_MOUSE_POS):
-                    diflev=2
-                    main_menu()    
-                if OPTIONS_HARD.checkForInput(OPTIONS_MOUSE_POS):
-                    diflev=3
-                    main_menu()
-        pygame.display.update()
-    return diflev  
-
+difficulty=Difficulty()
 def main_menu():
     while True:
         SCREEN.blit(BG, (0, 0))
@@ -170,11 +172,10 @@ def main_menu():
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
                     play()
                 if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    dl(diflev)
+                    difficulty.dl()
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                     pygame.quit()
                     sys.exit()
-
         pygame.display.update()
 
 main_menu()
