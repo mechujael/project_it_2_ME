@@ -733,7 +733,6 @@ def main(window,difficulty):
     offset_x=0
     scroll_area_width=500
     progress=0
-    difficulty=1#utilities.difficulty.diflev
     level1= Level1()
     objects=level1.objects(difficulty)
     run=True

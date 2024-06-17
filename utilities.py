@@ -205,6 +205,7 @@ class Difficulty():
 
 difficulty=Difficulty()
 def main_menu():
+
     while True:
         SCREEN.blit(BG, (0, 0))
 
