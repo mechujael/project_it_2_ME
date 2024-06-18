@@ -219,7 +219,7 @@ def main_menu():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                #clicked buttons
+                #clicked buttonssad
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
                     play()
                 if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
