@@ -45,6 +45,13 @@ def get_font(size): # Returns Press-Start-2P in the desired size
     return pygame.font.Font("assets/mainmenu/font.ttf", size)
 
 def play():
+    with open("settings.txt","r",newline="") as f:                        
+        reader=csv.reader(f)
+        list=[]
+        for row in reader:
+            list.append(row)
+        number1=list[1]
+        number2=list[2]
     while True:
         PLAY_MOUSE_POS = pygame.mouse.get_pos()
 
@@ -60,14 +67,18 @@ def play():
                             text_input="Forest", font=get_font(75), base_color="Ivory", hovering_color="darkcyan")
         PLAY_LEVELTWO = Button(image=None, pos=(940, 360), 
                             text_input="Mountain", font=get_font(75), base_color="Ivory", hovering_color="darkcyan")
-        
+        if int(number1[-1])==1:
+         PLAY_LEVELONE = Button(image=None, pos=(340, 360), 
+                            text_input="Forest", font=get_font(75), base_color="Gold", hovering_color="darkcyan")           
+        if int(number2[-1])==1:
+         PLAY_LEVELTWO = Button(image=None, pos=(940, 360), 
+                            text_input="Mountain", font=get_font(75), base_color="Gold", hovering_color="darkcyan")                   
         PLAY_BACK.changeColor(PLAY_MOUSE_POS)
         PLAY_BACK.update(SCREEN)
         PLAY_LEVELONE.changeColor(PLAY_MOUSE_POS)
         PLAY_LEVELONE.update(SCREEN)
         PLAY_LEVELTWO.changeColor(PLAY_MOUSE_POS)
         PLAY_LEVELTWO.update(SCREEN)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -76,8 +87,11 @@ def play():
                 if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
                     main_menu()
                 if PLAY_LEVELONE.checkForInput(PLAY_MOUSE_POS):
-                    main.main(SCREEN)
-
+                    main.main(SCREEN,"level1")
+                    main_menu()
+                if PLAY_LEVELTWO.checkForInput(PLAY_MOUSE_POS) and int(number1[-1])==1:
+                    main.main(SCREEN,"level2")
+                    main_menu()
         pygame.display.update()
 
 
@@ -115,10 +129,19 @@ class Difficulty():
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
-                        with open("settings.txt","w") as f:
+                        with open("settings.txt","r",newline="") as f:                        
+                            reader=csv.reader(f)
+                            list=[]
+                            for row in reader:
+                                list.append(row)
+                            number1=list[1]
+                            number2=list[2]
+                        with open("settings.txt","w",newline="") as f:
                              writer=csv.writer(f)
-                             row=["difficulty=",self.diff]
-                             writer.writerow(row)
+                             writer.writerow(["difficulty=",self.diff])
+                             writer.writerow(number1)                    
+                             writer.writerow(number2)
+
                         main_menu()
                     if OPTIONS_EASY.checkForInput(OPTIONS_MOUSE_POS):
                         self.diff=1
