@@ -19,7 +19,9 @@ color=(255,0,0)
 bigfont = pygame.font.Font(None, 80)
 smallfont = pygame.font.Font(None, 45)
 
-background=pygame.image.load(join("assets","bckgrnd","bg1.png"))
+def background(image):
+    background=pygame.image.load(join("assets","bckgrnd",image))
+    return background
 
 window=pygame.display.set_mode((WIDTH,HEIGHT))
 
@@ -525,15 +527,22 @@ def chilling_enemy_movement(chillEnemy_group,player,objects,fallingEnemy_group):
                 falling.counter=1
     
 
+#choosing level
+class Level_chose():
+    def __init__(self):
+        self.level_chosen="level1"
+level_xd=Level_chose()
 
-
+class Back():
+    def __init__(self):
+        self.backing=0
+back=Back()
 
 
 #drawing
-def draw(window,player,objects,offset_x,carrots,chillEnemy,progress,fallingEnemy_group,eggchamp):
+def draw(window,player,objects,offset_x,carrots,chillEnemy,progress,fallingEnemy_group,eggchamp,background_chosen):
 
-    window.blit(background,(0,0))
-
+    window.blit(background_chosen,(0,0))
     for obj in objects:
         obj.draw(window,offset_x)
     
@@ -955,9 +964,6 @@ class Level2():
 
 
 
-class Back():
-    def __init__(self):
-        self.backing=0
 
 def difficult():
     with open("settings.txt","r",newline="") as f:                        
@@ -983,15 +989,10 @@ def winning(player,eggchamp):
         finished=0
     return finished
 
-class Level_chose():
-    def __init__(self):
-        self.level_chosen="level1"
-level_xd=Level_chose()
 
-
-back=Back()
 #CONTROL OF TIME
 def main(window,level):
+
     clock=pygame.time.Clock()
     player = Player(50,150,65,65)
     offset_x=0
@@ -1006,6 +1007,10 @@ def main(window,level):
     elif level=="level2":
         level_xd.level_chosen="level2"
         level_chosen=Level2()
+    if level_xd.level_chosen=="level1":
+        background_chosen=background("bg1.png")
+    elif level_xd.level_chosen=="level2":
+        background_chosen=background("bg2.png")
     difficulty=difficult()
     objects=level_chosen.objects(difficulty)
     run=True
@@ -1049,7 +1054,7 @@ def main(window,level):
         for chill in ChillEnemy_group:
             chill.char_loop()
         chilling_enemy_movement(ChillEnemy_group,player,objects,FallingEnemy_group)
-        draw(window,player,objects,offset_x,carrot_group,ChillEnemy_group,progress,FallingEnemy_group,eggchamp)
+        draw(window,player,objects,offset_x,carrot_group,ChillEnemy_group,progress,FallingEnemy_group,eggchamp,background_chosen)
         carrot_interaction(player,carrot_group)
         if ((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_vel > 0) or (
                 (player.rect.left - offset_x <= scroll_area_width) and player.x_vel < 0):
@@ -1059,7 +1064,7 @@ def main(window,level):
         if winning(player,eggchamp) ==1:
             run=False
     if player.hit==5 or player.rect.y>=HEIGHT:
-        window.blit(background,(0,0))
+        window.blit(background("Background.png"),(0,0))
         pygame.mixer.music.fadeout(1000)
         run=play_again()
     elif eggchamp.level1==1:

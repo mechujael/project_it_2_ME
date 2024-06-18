@@ -1,3 +1,3 @@
-difficulty=,3
+difficulty=,2
 level1=,1
 level2=,1
