@@ -558,13 +558,13 @@ def draw(window,player,objects,offset_x,carrots,chillEnemy,progress,fallingEnemy
 
 class EggChamp():
     COLOR=(255,0,0)
-    SPRITES = load_spritesheets( 65, 65,"carrot", "carrot_animation", False)
+    SPRITES = load_spritesheets( 65, 65,"egg", "egg_anime", False)
     ANIMATION_DELAY=7
     def __init__(self,x,y,width,height):
         
         super(EggChamp,self).__init__()
         self.rect=pygame.Rect(x,y,width,height)
-        path = join("assets","carrot", "Carrot.png")
+        path = join("assets","egg", "egg.png")
         self.image = pygame.image.load(path).convert_alpha()
         self.surface = pygame.Surface((width, height),pygame.SRCALPHA, 32)
         self.animation_count=0
@@ -576,9 +576,9 @@ class EggChamp():
         self.wait=0
 
     def sprite_animation(self):
-        sprite_sheet ="Carrot"
+        sprite_sheet ="egg"
         if self.pick!=0:
-            sprite_sheet="Carrot"
+            sprite_sheet="egg"
         sprite_sheet_name = sprite_sheet
         sprites = self.SPRITES[sprite_sheet_name]
         sprite_index = (self.animation_count //
@@ -588,7 +588,7 @@ class EggChamp():
         self.update()
 
 
-    def char_loop(self):
+    def char_loop(self):           
         self.sprite_animation()
 
     def fetch_levels(self):
@@ -597,7 +597,6 @@ class EggChamp():
             list=[]
             for row in reader:
                 list.append(row)
-        print(list)
         number=list[0]
         self.diff=int(number[-1])
         del number
@@ -612,12 +611,10 @@ class EggChamp():
         self.mask = pygame.mask.from_surface(self.sprite)
 
 
-
     def draw(self,window,offset_x):
         window.blit(self.sprite,(self.rect.x -offset_x,self.rect.y))   
 
     def writing(self):
-        print(1)
         with open("settings.txt","w",newline="") as f:
             writer=csv.writer(f)
             writer.writerow(["difficulty=",self.diff])
@@ -802,11 +799,29 @@ def difficult():
     difficulty=int(number[-1])
     return difficulty
 
+def winning(player,eggchamp):
+    key=pygame.key.get_pressed()
+    if pygame.sprite.collide_mask(player,eggchamp) and key[pygame.K_e] and level_xd.level_chosen=="level1":
+        eggchamp.level1=1
+        eggchamp.writing()
+        finished=1
+    elif pygame.sprite.collide_mask(player,eggchamp) and key[pygame.K_e] and level_xd.level_chosen=="level2":
+        eggchamp.level2=1
+        eggchamp.writing()
+        finished=1
+    else:
+        finished=0
+    return finished
 
-#def start()
+class Level_chose():
+    def __init__(self):
+        self.level_chosen="level1"
+level_xd=Level_chose()
+
+
 back=Back()
 #CONTROL OF TIME
-def main(window):
+def main(window,level):
     clock=pygame.time.Clock()
     player = Player(50,150,65,65)
     offset_x=0
@@ -815,9 +830,14 @@ def main(window):
     eggchamp=EggChamp(WIDTH*5-block_size*3,HEIGHT-block_size-65,65,65)
     eggchamp.fetch_levels()
     eggchamp.writing()
-    level1= Level1()
+    if level=="level1":
+      level_xd.level_chosen="level1"
+      level_chosen= Level1()
+    elif level=="level2":
+        level_xd.level_chosen="level2"
+        level_chosen=Level1()
     difficulty=difficult()
-    objects=level1.objects(difficulty)
+    objects=level_chosen.objects(difficulty)
     run=True
     while run==True:
         clock.tick(FPS)
@@ -843,14 +863,14 @@ def main(window):
             carrot_group.empty()
             run=False
 
-        progr=(player.rect.x/(level1.length()-65*2))
+        progr=(player.rect.x/(level_chosen.length()-65*2))
         if progress<=progr:
             progress=progr
         else:
             pass
 
         player.char_loop(FPS)
-        level1.enemies(player,difficulty)
+        level_chosen.enemies(player,difficulty)
         eggchamp.char_loop()
         grav(player)
         player_move(player,objects,player.y_vel)
@@ -865,9 +885,15 @@ def main(window):
                 (player.rect.left - offset_x <= scroll_area_width) and player.x_vel < 0):
             
             offset_x += player.x_vel
-    window.blit(background,(0,0))
-    pygame.mixer.music.fadeout(1000)
-    run=play_again()
+
+        if winning(player,eggchamp) ==1:
+            run=False
+    if player.hit==5 or player.rect.y>=HEIGHT:
+        window.blit(background,(0,0))
+        pygame.mixer.music.fadeout(1000)
+        run=play_again()
+    elif eggchamp.level1==1:
+        Back.backing=1
 
 SCREEN = pygame.display.set_mode((1280, 720))
 
@@ -928,7 +954,7 @@ def play_again():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 #clicked buttons
                 if PLAY_AGAIN_BUTTON.checkForInput(PLAY_AGAIN_POS):
-                    main(window)
+                    main(window,level_xd.level_chosen)
                     break
                 if MAINMENU_BUTTON.checkForInput(PLAY_AGAIN_POS):
                     Back.backing=1
@@ -942,5 +968,5 @@ def play_again():
 
 #calling the main function to start as soon, as the run of the code starts
 while __name__=="__main__":
-    main(window)
+    main(window,level_xd.level_chosen)
 
