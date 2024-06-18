@@ -407,6 +407,11 @@ class FallingEnemy(pygame.sprite.Sprite):
         
         super(FallingEnemy,self).__init__()
         self.rect=pygame.Rect(x,y,width,height)
+        x=random.randint(0,1)
+        if x==1:
+            self.dir="bird3walking"
+        else:
+            self.dir="bird4walking"
         path = join("assets","Enemy","fallingEnemy","bird3walking.png")
         self.image = pygame.image.load(path).convert_alpha()
         self.surface = pygame.Surface((width, height),pygame.SRCALPHA, 32)
@@ -421,9 +426,9 @@ class FallingEnemy(pygame.sprite.Sprite):
         self.counter=0
 
     def sprite_animation(self):
-        sprite_sheet = "bird3walking"
+        sprite_sheet = self.dir
         if self.x_vel != 0:
-            sprite_sheet = "bird3walking"
+            sprite_sheet = self.dir
 
         sprite_sheet_name = sprite_sheet + "_" + self.direction
         sprites = self.SPRITES[sprite_sheet_name]
