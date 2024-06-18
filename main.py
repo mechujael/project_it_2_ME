@@ -77,8 +77,7 @@ class Player(pygame.sprite.Sprite):
         self.jump=0
         self.mask=None
         self.direction="left"
-        self.weight=50
-
+        self.weight=45
         self.boost=0
         self.hit=0
         self.hit_chill=0
@@ -103,6 +102,7 @@ class Player(pygame.sprite.Sprite):
     def move(self,dx,dy):
         self.rect.x+=dx
         self.rect.y+=dy
+
         return
     
     def move_left(self,vel):
@@ -117,6 +117,8 @@ class Player(pygame.sprite.Sprite):
     
     def move_up(self,vel):
         self.y_vel=-vel*2
+        if self.rect.y<=0:
+            self.y_vel*=0.25
         self.weight=50
         if self.jump==0:
             self.weight=25
@@ -307,7 +309,10 @@ class ChillEnemy(pygame.sprite.Sprite):
         self.distance=(distance-1)*block_size+(block_size-self.rect.width)
         self.travel=0.1
         self.dir=dir1
-
+        self.bounce=0 
+        self.bouncewait=250
+        self.bouncebounce=20
+        
     def sprite_animation(self):
         sprite_sheet = self.dir
         if self.wait!=0:
@@ -338,6 +343,28 @@ class ChillEnemy(pygame.sprite.Sprite):
 
     def char_loop(self):
         self.move(self.x_vel, self.y_vel)
+        print(self.bounce)
+        if self.bounce==1 and self.bouncebounce>0:
+            self.bouncebounce-=1
+        if self.bounce==2 and self.bouncebounce!=0:
+            self.bounce=1
+        elif self.bounce==2 and self.bouncebounce==0:
+            self.bouncebounce==20
+            pass
+        elif self.bounce==3 and self.bouncebounce>0:
+            print(1)
+            self.bouncebounce-=1
+        elif self.bounce==3 and self.bouncebounce==0:
+            self.bouncebounce=20
+            pass
+
+        if self.bounce>=3 and self.bouncewait<=250 and self.bouncewait>0:
+            self.bouncewait-=1
+        elif self.bouncewait==0:
+            self.bounce=0
+            self.bouncewait=250
+
+
         if self.x_vel>0:
             if self.direction!="right":
                 self.direction="right"      
@@ -512,11 +539,11 @@ def chilling_enemy_movement(chillEnemy_group,player,objects,fallingEnemy_group):
             if player.rect.bottom>=chill.rect.bottom-20:
                 player.hit_chill=1
                 break
-            else:
-                player.y_vel*=-1
+            elif chill.bounce<=2:
+                player.y_vel*=-1.1
                 chill.hit=1
                 player.hit_chill=0
-            
+                chill.bounce+=1
             player.update()
         else:
             player.hit_chill=0
@@ -831,26 +858,65 @@ class Level2():
 
         steps=[Block(self.block_size*25+i*self.block_size, HEIGHT - self.block_size * 2, self.block_size,"mblock2.png")
                for i in range(0,5)]
+        for i in range(0,3):
+            steps.append(Block(self.block_size*35+i*self.block_size, HEIGHT - self.block_size * 2, self.block_size,"mblock2.png"))
+        for k in range(1,5,1):
+            steps.append(Block(15 * self.block_size, HEIGHT - self.block_size * k, self.block_size,"Mblock1.png"))
+            steps.append(Block(56 * self.block_size, HEIGHT - self.block_size * k, self.block_size,"Mblock1.png"))            
+        for k in range(8,9,1):
+            steps.append(Block(18 * self.block_size, HEIGHT - self.block_size * k, self.block_size,"Mblock1.png"))
+            steps.append(Block(19 * self.block_size, HEIGHT - self.block_size * k, self.block_size,"Mblock1.png"))
+
         for k in range(45,47,1):
             steps.append(Block(k * self.block_size, HEIGHT - self.block_size * 4, self.block_size,"Mblock1.png"))
             steps.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"Mblock1.png")) 
-        for k in range(4,8,1):
-            steps.append(Block(49 * self.block_size, HEIGHT - self.block_size * k, self.block_size,"Mblock1.png"))
-               
-        for i in range(0,3):
-            steps.append(Block(self.block_size*35+i*self.block_size, HEIGHT - self.block_size * 2, self.block_size,"mblock2.png"))
+        for k in range(8,10,1):
+            steps.append(Block(15 * self.block_size, HEIGHT - self.block_size * k, self.block_size,"Mblock1.png"))
+        for k in range(1,7,1):
+            steps.append(Block(56 * self.block_size, HEIGHT - self.block_size * k, self.block_size,"Mblock1.png"))  
+        for k in range(5,10,1):
+            steps.append(Block(49 * self.block_size, HEIGHT - self.block_size * k, self.block_size,"Mblock1.png"))                    
 
 
 
 
         platforms= []
-        for k in range(12,17,1):
+        for k in range(0,12,1):
             platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"mblock2.png"))
+        for k in range(5,12,2):
             for obj in floor:
                 if obj.rect.x==k*self.block_size:
                     floor.remove(obj)
-        for k in range(27,30):
-           platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"mblock2.png"))  
+        for k in range(5,15,1):
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"mblock2.png"))
+
+        platforms.append(Block(15 * self.block_size, HEIGHT - self.block_size * 8, self.block_size,"mblock2.png"))
+        platforms.append(Block(15 * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"mblock2.png"))
+        platforms.append(Block(47 * self.block_size, HEIGHT - self.block_size * 2, self.block_size,"mblock2.png"))
+        platforms.append(Block(55 * self.block_size, HEIGHT - self.block_size * 2, self.block_size,"mblock2.png"))
+        platforms.append(Block(54 * self.block_size, HEIGHT - self.block_size * 4, self.block_size,"mblock2.png"))
+        platforms.append(Block(54 * self.block_size, HEIGHT - self.block_size * 6, self.block_size,"mblock2.png"))
+        platforms.append(Block(56 * self.block_size, HEIGHT - self.block_size * 7, self.block_size,"mblock2.png"))
+        for k in range(27,29):
+           platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"mblock2.png"))
+           for obj in floor:
+                if obj.rect.x==k*self.block_size:
+                    floor.remove(obj)     
+        for k in range(29,32):
+           for obj in floor:
+                if obj.rect.x==k*self.block_size:
+                    floor.remove(obj)    
+        for k in range(48,50):
+           for obj in floor:
+                if obj.rect.x==k*self.block_size:
+                    floor.remove(obj)
+        for k in range(51,53):
+           for obj in floor:
+                if obj.rect.x==k*self.block_size:
+                    floor.remove(obj)
+        for k in range(50,53):
+           platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"mblock2.png"))
+
         for k in range(32,34):
            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"mblock2.png"))
            for obj in floor:
@@ -871,30 +937,14 @@ class Level2():
             platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"mblock2.png"))
             for obj in floor:
                 if obj.rect.x==k*self.block_size:
-                    floor.remove(obj)
-           
+                    floor.remove(obj)           
         for k in range(45,47,1):
             platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"mblock2.png"))
             for obj in floor:
                 if obj.rect.x==45*self.block_size:
                     floor.remove(obj)       
-        platforms.append(Block(49 * self.block_size, HEIGHT - self.block_size * 8, self.block_size,"mblock2.png"))
-        for i in range(49,51,1):
-            for obj in floor:
-                if obj.rect.x==i*self.block_size:
-                    floor.remove(obj)          
-        for k in range(51,53,1):
-            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 2, self.block_size,"mblock2.png"))
-            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 6, self.block_size,"mblock2.png"))           
-            for obj in floor:
-                if obj.rect.x==k*self.block_size:
-                    floor.remove(obj)                  
-        platforms.append(Block(50 * self.block_size, HEIGHT - self.block_size * 4, self.block_size,"mblock2.png"))
-        for k in range(53,58):
-            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"mblock2.png"))           
-            for obj in floor:
-                if obj.rect.x==k*self.block_size:
-                    floor.remove(obj)              
+
+         
 
         walls=[]
         for k in range(0,HEIGHT//self.block_size+1):
@@ -902,8 +952,9 @@ class Level2():
                 walls.append(Block(i * self.block_size, k*self.block_size, self.block_size,"Mblock1.png"))
         for k in range(0,HEIGHT//self.block_size+1):
             for i in range((WIDTH*5)//self.block_size,((WIDTH*5)//self.block_size)+6,1):
-                walls.append(Block(i * self.block_size, k*self.block_size, self.block_size,"Mblock1.png"))
-        objects = [*floor,*walls,*steps,*platforms,Block(200, HEIGHT - self.block_size * 2, self.block_size,"mblock2.png"),Block(500, HEIGHT - self.block_size * 4, self.block_size,"mblock2.png")]
+                walls.append(Block(i * self.block_size, k*self.block_size, self.block_size,"Mblock1.png"))      
+    
+        objects = [*floor,*walls,*steps,*platforms,]
 
         #carrot distribution system
         if difficulty==1:
@@ -943,15 +994,16 @@ class Level2():
         
         #stationary enemies
         dir=["bird1walking","bird2walking"]
-        ChillEnemy_group.add(ChillEnemy(12*block_size,HEIGHT-block_size*3-65,65,65,5,dir[random.randint(0,1)]))
         ChillEnemy_group.add(ChillEnemy(18*block_size,HEIGHT-block_size*5-65,65,65,2,dir[random.randint(0,1)]))
         ChillEnemy_group.add(ChillEnemy(40*block_size,HEIGHT-block_size*5-65,65,65,4,dir[random.randint(0,1)]))
         ChillEnemy_group.add(ChillEnemy(45*block_size,HEIGHT-block_size*5-65,65,65,2,dir[random.randint(0,1)]))
-        ChillEnemy_group.add(ChillEnemy(51*block_size,HEIGHT-block_size*2-65,65,65,2,dir[random.randint(0,1)]))
-        ChillEnemy_group.add(ChillEnemy(53*block_size,HEIGHT-block_size*5-65,65,65,5,dir[random.randint(0,1)]))
-        ChillEnemy_group.add(ChillEnemy(27*block_size,HEIGHT-block_size*3-65,65,65,3,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(50*block_size,HEIGHT-block_size*1-65,65,65,1,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(37*block_size,HEIGHT-block_size*3-65,65,65,5,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(25*block_size,HEIGHT-block_size*2-65,65,65,5,dir[random.randint(0,1)]))
         ChillEnemy_group.add(ChillEnemy(20*block_size,HEIGHT-block_size*1-65,65,65,5,dir[random.randint(0,1)]))
-        ChillEnemy_group.add(ChillEnemy(3*block_size,HEIGHT-block_size*1-65,65,65,8,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(3*block_size,HEIGHT-block_size*3-65,65,65,5,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(0*block_size,HEIGHT-block_size*3-65,65,65,8,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(8*block_size,HEIGHT-block_size*5-65,65,65,8,dir[random.randint(0,1)]))
         return objects
     
     def length(self):
@@ -994,7 +1046,7 @@ def winning(player,eggchamp):
 def main(window,level):
 
     clock=pygame.time.Clock()
-    player = Player(50,150,65,65)
+    player = Player(50,HEIGHT-96*2,65,65)
     offset_x=0
     scroll_area_width=500
     progress=0
@@ -1063,6 +1115,12 @@ def main(window,level):
 
         if winning(player,eggchamp) ==1:
             run=False
+    for carrot in carrot_group:
+        carrot.kill()
+    for falling in FallingEnemy_group:
+        falling.kill()
+    for chill in ChillEnemy_group:
+        chill.kill()
     if player.hit==5 or player.rect.y>=HEIGHT:
         window.blit(background("Background.png"),(0,0))
         pygame.mixer.music.fadeout(1000)
