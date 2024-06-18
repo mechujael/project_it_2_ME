@@ -14,7 +14,7 @@ pygame.display.set_caption("calm birds")
 
 WIDTH,HEIGHT=1280,720
 FPS=60
-PLAYER_VEL=5
+PLAYER_VEL=15
 color=(255,0,0)
 bigfont = pygame.font.Font(None, 80)
 smallfont = pygame.font.Font(None, 45)
@@ -362,7 +362,6 @@ class ChillEnemy(pygame.sprite.Sprite):
         self.sprite_animation()
 
 
-
     def update(self):
         self.mask = pygame.mask.from_surface(self.sprite)
 
@@ -531,7 +530,7 @@ def chilling_enemy_movement(chillEnemy_group,player,objects,fallingEnemy_group):
 
 
 #drawing
-def draw(window,player,objects,offset_x,carrots,chillEnemy,progress,fallingEnemy_group):
+def draw(window,player,objects,offset_x,carrots,chillEnemy,progress,fallingEnemy_group,eggchamp):
 
     window.blit(background,(0,0))
 
@@ -546,7 +545,7 @@ def draw(window,player,objects,offset_x,carrots,chillEnemy,progress,fallingEnemy
         chill.draw(window,offset_x)
     for falling in fallingEnemy_group:
         falling.draw(window,offset_x)
-
+    eggchamp.draw(window,offset_x)
 
     maxwidth=350
     pygame.draw.rect(window, (0,0,0), pygame.Rect(WIDTH/2-maxwidth/2-3,0,maxwidth+6,41))  
@@ -557,6 +556,73 @@ def draw(window,player,objects,offset_x,carrots,chillEnemy,progress,fallingEnemy
     pygame.display.update()
 
 
+class EggChamp():
+    COLOR=(255,0,0)
+    SPRITES = load_spritesheets( 65, 65,"carrot", "carrot_animation", False)
+    ANIMATION_DELAY=7
+    def __init__(self,x,y,width,height):
+        
+        super(EggChamp,self).__init__()
+        self.rect=pygame.Rect(x,y,width,height)
+        path = join("assets","carrot", "Carrot.png")
+        self.image = pygame.image.load(path).convert_alpha()
+        self.surface = pygame.Surface((width, height),pygame.SRCALPHA, 32)
+        self.animation_count=0
+        self.mask=None
+        self.pick=0
+        self.level1=0
+        self.level2=0
+        self.diff=0
+        self.wait=0
+
+    def sprite_animation(self):
+        sprite_sheet ="Carrot"
+        if self.pick!=0:
+            sprite_sheet="Carrot"
+        sprite_sheet_name = sprite_sheet
+        sprites = self.SPRITES[sprite_sheet_name]
+        sprite_index = (self.animation_count //
+                        self.ANIMATION_DELAY) % len(sprites)
+        self.sprite = sprites[sprite_index]
+        self.animation_count += 1
+        self.update()
+
+
+    def char_loop(self):
+        self.sprite_animation()
+
+    def fetch_levels(self):
+        with open("settings.txt","r",newline="") as f:                        
+            reader=csv.reader(f)
+            list=[]
+            for row in reader:
+                list.append(row)
+        print(list)
+        number=list[0]
+        self.diff=int(number[-1])
+        del number
+        number=list[1]
+        self.level1=int(number[-1])
+        del number
+        number=list[2]
+        self.level2=int(number[-1])
+        del number
+
+    def update(self):
+        self.mask = pygame.mask.from_surface(self.sprite)
+
+
+
+    def draw(self,window,offset_x):
+        window.blit(self.sprite,(self.rect.x -offset_x,self.rect.y))   
+
+    def writing(self):
+        print(1)
+        with open("settings.txt","w",newline="") as f:
+            writer=csv.writer(f)
+            writer.writerow(["difficulty=",self.diff])
+            writer.writerow(["level1=",self.level1])                    
+            writer.writerow(["level2=",self.level2])
 
 FallingEnemy_group=pygame.sprite.Group() 
 ChillEnemy_group=pygame.sprite.Group()    
@@ -735,6 +801,8 @@ def difficult():
     number=list[0]
     difficulty=int(number[-1])
     return difficulty
+
+
 #def start()
 back=Back()
 #CONTROL OF TIME
@@ -744,6 +812,9 @@ def main(window):
     offset_x=0
     scroll_area_width=500
     progress=0
+    eggchamp=EggChamp(WIDTH*5-block_size*3,HEIGHT-block_size-65,65,65)
+    eggchamp.fetch_levels()
+    eggchamp.writing()
     level1= Level1()
     difficulty=difficult()
     objects=level1.objects(difficulty)
@@ -780,7 +851,7 @@ def main(window):
 
         player.char_loop(FPS)
         level1.enemies(player,difficulty)
-
+        eggchamp.char_loop()
         grav(player)
         player_move(player,objects,player.y_vel)
         for falling in FallingEnemy_group:
@@ -788,7 +859,7 @@ def main(window):
         for chill in ChillEnemy_group:
             chill.char_loop()
         chilling_enemy_movement(ChillEnemy_group,player,objects,FallingEnemy_group)
-        draw(window,player,objects,offset_x,carrot_group,ChillEnemy_group,progress,FallingEnemy_group)
+        draw(window,player,objects,offset_x,carrot_group,ChillEnemy_group,progress,FallingEnemy_group,eggchamp)
         carrot_interaction(player,carrot_group)
         if ((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_vel > 0) or (
                 (player.rect.left - offset_x <= scroll_area_width) and player.x_vel < 0):
