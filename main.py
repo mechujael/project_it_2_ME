@@ -4,13 +4,14 @@ import random
 import sys
 from os import listdir
 from os.path import isfile, join
-#import utilities
+import csv
 
 pygame.init()
 pygame.display.set_caption("calm birds")
 
 
 #BASIC SETTINGS
+
 WIDTH,HEIGHT=1280,720
 FPS=60
 PLAYER_VEL=5
@@ -25,7 +26,6 @@ window=pygame.display.set_mode((WIDTH,HEIGHT))
 def flip_sprites(sprites):
     return[pygame.transform.flip(sprite,True,False) for sprite in sprites]
 def load_spritesheets(width,height,dir1,dir2,direction):
-    print(1)
     path=join("assets",dir1,dir2)
     images=[f for f in listdir(path) if isfile(join(path,f))]
     all_sprites={}
@@ -726,17 +726,26 @@ class Back():
     def __init__(self):
         self.backing=0
 
-
-
+def difficult():
+    with open("settings.txt","r",newline="") as f:                        
+        reader=csv.reader(f)
+        list=[]
+        for row in reader:
+            list.append(row)
+    number=list[0]
+    difficulty=int(number[-1])
+    return difficulty
+#def start()
 back=Back()
 #CONTROL OF TIME
-def main(window,difficulty):
+def main(window):
     clock=pygame.time.Clock()
     player = Player(50,150,65,65)
     offset_x=0
     scroll_area_width=500
     progress=0
     level1= Level1()
+    difficulty=difficult()
     objects=level1.objects(difficulty)
     run=True
     while run==True:
@@ -787,7 +796,7 @@ def main(window,difficulty):
             offset_x += player.x_vel
     window.blit(background,(0,0))
     pygame.mixer.music.fadeout(1000)
-    run=play_again(difficulty)
+    run=play_again()
 
 SCREEN = pygame.display.set_mode((1280, 720))
 
@@ -824,7 +833,7 @@ class Button():
 def get_font(size): # Returns Press-Start-2P in the desired size
     return pygame.font.Font("assets/mainmenu/font.ttf", size)
 
-def play_again(difficulty):
+def play_again():
 
     run=True
     while run:
@@ -848,7 +857,7 @@ def play_again(difficulty):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 #clicked buttons
                 if PLAY_AGAIN_BUTTON.checkForInput(PLAY_AGAIN_POS):
-                    main(window,difficulty)
+                    main(window)
                     break
                 if MAINMENU_BUTTON.checkForInput(PLAY_AGAIN_POS):
                     Back.backing=1
@@ -856,7 +865,6 @@ def play_again(difficulty):
                     break
 
         pygame.display.update()
-
 
 
 

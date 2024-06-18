@@ -1,6 +1,7 @@
 import pygame, sys
 import main
 from os.path import join
+import csv
 
 pygame.init()
 #button
@@ -75,7 +76,7 @@ def play():
                 if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
                     main_menu()
                 if PLAY_LEVELONE.checkForInput(PLAY_MOUSE_POS):
-                    main.main(SCREEN,difficulty.diflev)
+                    main.main(SCREEN)
 
         pygame.display.update()
 
@@ -84,8 +85,15 @@ def play():
 class Difficulty():
     def __init__(self):
         super(Difficulty,self).__init__()        
-        self.diflev=1
-        self.diff=1
+        with open("settings.txt","r",newline="") as f:                        
+            reader=csv.reader(f)
+            list=[]
+            for row in reader:
+                list.append(row)
+        number=list[0]
+        self.diff=int(number[-1])
+        list.clear()
+        del number
 
 
     def dl(self):
@@ -107,14 +115,17 @@ class Difficulty():
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
+                        with open("settings.txt","w") as f:
+                             writer=csv.writer(f)
+                             row=["difficulty=",self.diff]
+                             writer.writerow(row)
                         main_menu()
                     if OPTIONS_EASY.checkForInput(OPTIONS_MOUSE_POS):
-                        self.diflev=1
+                        self.diff=1
                     if OPTIONS_MEDIUM.checkForInput(OPTIONS_MOUSE_POS):
-                        self.diflev=2
+                        self.diff=2
                     if OPTIONS_HARD.checkForInput(OPTIONS_MOUSE_POS):
-                        self.diflev=3
-            self.diff=self.diflev
+                        self.diff=3
             if self.diff==1:
                 OPTIONS_EASY = Button(image=None, pos=(640, 160),
 							    text_input="Easy", font=get_font(45), base_color="Palegreen", hovering_color="Palegreen")
