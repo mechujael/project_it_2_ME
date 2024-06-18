@@ -1010,7 +1010,7 @@ def main(window,level):
     if level_xd.level_chosen=="level1":
         background_chosen=background("bg1.png")
     elif level_xd.level_chosen=="level2":
-        background_chosen=background("bg2.png")
+        background_chosen=background("bgmountain.png")
     difficulty=difficult()
     objects=level_chosen.objects(difficulty)
     run=True
