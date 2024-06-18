@@ -824,74 +824,74 @@ class Level2():
         return
 
     def objects(self,difficulty):
-        floor = [Block(i * self.block_size, HEIGHT - self.block_size, self.block_size,"block_1.png")
+        floor = [Block(i * self.block_size, HEIGHT - self.block_size, self.block_size,"mblock2.png")
              for i in range(0, (WIDTH * 5) // self.block_size)]
         
 
 
-        steps=[Block(self.block_size*25+i*self.block_size, HEIGHT - self.block_size * 2, self.block_size,"block_1.png")
+        steps=[Block(self.block_size*25+i*self.block_size, HEIGHT - self.block_size * 2, self.block_size,"mblock2.png")
                for i in range(0,5)]
         for k in range(45,47,1):
-            steps.append(Block(k * self.block_size, HEIGHT - self.block_size * 4, self.block_size,"wall_1.png"))
-            steps.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"wall_1.png")) 
+            steps.append(Block(k * self.block_size, HEIGHT - self.block_size * 4, self.block_size,"Mblock1.png"))
+            steps.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"Mblock1.png")) 
         for k in range(4,8,1):
-            steps.append(Block(49 * self.block_size, HEIGHT - self.block_size * k, self.block_size,"wall_1.png"))
+            steps.append(Block(49 * self.block_size, HEIGHT - self.block_size * k, self.block_size,"Mblock1.png"))
                
         for i in range(0,3):
-            steps.append(Block(self.block_size*35+i*self.block_size, HEIGHT - self.block_size * 2, self.block_size,"block_1.png"))
+            steps.append(Block(self.block_size*35+i*self.block_size, HEIGHT - self.block_size * 2, self.block_size,"mblock2.png"))
 
 
 
 
         platforms= []
         for k in range(12,17,1):
-            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"block_1.png"))
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"mblock2.png"))
             for obj in floor:
                 if obj.rect.x==k*self.block_size:
                     floor.remove(obj)
         for k in range(27,30):
-           platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"block_1.png"))  
+           platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"mblock2.png"))  
         for k in range(32,34):
-           platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"block_1.png"))
+           platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"mblock2.png"))
            for obj in floor:
                 if obj.rect.x==k*self.block_size:
                     floor.remove(obj)        
         for k in range(18,20,1):
-            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"block_1.png"))
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"mblock2.png"))
             for obj in floor:
                 if obj.rect.x==k*self.block_size:
                     floor.remove(obj)
         for k in range(37,42,1):
-            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"block_1.png"))
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"mblock2.png"))
             for obj in floor:
                 if obj.rect.x==k*self.block_size:
                     floor.remove(obj)
                   
         for k in range(40,44,1):
-            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"block_1.png"))
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"mblock2.png"))
             for obj in floor:
                 if obj.rect.x==k*self.block_size:
                     floor.remove(obj)
            
         for k in range(45,47,1):
-            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"block_1.png"))
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"mblock2.png"))
             for obj in floor:
                 if obj.rect.x==45*self.block_size:
                     floor.remove(obj)       
-        platforms.append(Block(49 * self.block_size, HEIGHT - self.block_size * 8, self.block_size,"block_1.png"))
+        platforms.append(Block(49 * self.block_size, HEIGHT - self.block_size * 8, self.block_size,"mblock2.png"))
         for i in range(49,51,1):
             for obj in floor:
                 if obj.rect.x==i*self.block_size:
                     floor.remove(obj)          
         for k in range(51,53,1):
-            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 2, self.block_size,"block_1.png"))
-            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 6, self.block_size,"block_1.png"))           
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 2, self.block_size,"mblock2.png"))
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 6, self.block_size,"mblock2.png"))           
             for obj in floor:
                 if obj.rect.x==k*self.block_size:
                     floor.remove(obj)                  
-        platforms.append(Block(50 * self.block_size, HEIGHT - self.block_size * 4, self.block_size,"block_1.png"))
+        platforms.append(Block(50 * self.block_size, HEIGHT - self.block_size * 4, self.block_size,"mblock2.png"))
         for k in range(53,58):
-            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"block_1.png"))           
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"mblock2.png"))           
             for obj in floor:
                 if obj.rect.x==k*self.block_size:
                     floor.remove(obj)              
@@ -899,11 +899,11 @@ class Level2():
         walls=[]
         for k in range(0,HEIGHT//self.block_size+1):
             for i in range(-6,0,1):
-                walls.append(Block(i * self.block_size, k*self.block_size, self.block_size,"wall_1.png"))
+                walls.append(Block(i * self.block_size, k*self.block_size, self.block_size,"Mblock1.png"))
         for k in range(0,HEIGHT//self.block_size+1):
             for i in range((WIDTH*5)//self.block_size,((WIDTH*5)//self.block_size)+6,1):
-                walls.append(Block(i * self.block_size, k*self.block_size, self.block_size,"wall_1.png"))
-        objects = [*floor,*walls,*steps,*platforms,Block(200, HEIGHT - self.block_size * 2, self.block_size,"block_1.png"),Block(500, HEIGHT - self.block_size * 4, self.block_size,"block_1.png")]
+                walls.append(Block(i * self.block_size, k*self.block_size, self.block_size,"Mblock1.png"))
+        objects = [*floor,*walls,*steps,*platforms,Block(200, HEIGHT - self.block_size * 2, self.block_size,"mblock2.png"),Block(500, HEIGHT - self.block_size * 4, self.block_size,"mblock2.png")]
 
         #carrot distribution system
         if difficulty==1:
