@@ -624,6 +624,11 @@ class EggChamp():
 FallingEnemy_group=pygame.sprite.Group() 
 ChillEnemy_group=pygame.sprite.Group()    
 block_size=96
+
+
+
+
+
 class Level1():
     def __init__(self):
         self.block_size=96
@@ -784,6 +789,171 @@ class Level1():
         length=WIDTH*5
         return length
 
+class Level2():
+    def __init__(self):
+        self.block_size=96
+        self.x_distribution=self.block_size*5
+        pygame.mixer.music.load(join("assets","music","Bad Piggies Theme - Roblox Got Talent (Piano Cover).mp3"))
+        pygame.mixer.music.play(-1)
+        pygame.mixer.music.set_volume(0.4)
+        self.delay=int(0)
+
+
+    def enemies(self,player,difficulty):
+
+        if difficulty==1:
+            chance=1
+        if difficulty==2:
+            chance=4
+        if difficulty==3:
+            chance=7
+        k=random.randint(int(player.rect.x),int(player.rect.x+WIDTH))    
+        fallingEnemy=FallingEnemy(k,0,65,65)
+        guess=random.randint(1,100)
+        if guess<=chance:  
+            FallingEnemy_group.add(fallingEnemy)  
+        return
+
+    def objects(self,difficulty):
+        floor = [Block(i * self.block_size, HEIGHT - self.block_size, self.block_size,"block_1.png")
+             for i in range(0, (WIDTH * 5) // self.block_size)]
+        
+
+
+        steps=[Block(self.block_size*25+i*self.block_size, HEIGHT - self.block_size * 2, self.block_size,"block_1.png")
+               for i in range(0,5)]
+        for k in range(45,47,1):
+            steps.append(Block(k * self.block_size, HEIGHT - self.block_size * 4, self.block_size,"wall_1.png"))
+            steps.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"wall_1.png")) 
+        for k in range(4,8,1):
+            steps.append(Block(49 * self.block_size, HEIGHT - self.block_size * k, self.block_size,"wall_1.png"))
+               
+        for i in range(0,3):
+            steps.append(Block(self.block_size*35+i*self.block_size, HEIGHT - self.block_size * 2, self.block_size,"block_1.png"))
+
+
+
+
+        platforms= []
+        for k in range(12,17,1):
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"block_1.png"))
+            for obj in floor:
+                if obj.rect.x==k*self.block_size:
+                    floor.remove(obj)
+        for k in range(27,30):
+           platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"block_1.png"))  
+        for k in range(32,34):
+           platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"block_1.png"))
+           for obj in floor:
+                if obj.rect.x==k*self.block_size:
+                    floor.remove(obj)        
+        for k in range(18,20,1):
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"block_1.png"))
+            for obj in floor:
+                if obj.rect.x==k*self.block_size:
+                    floor.remove(obj)
+        for k in range(37,42,1):
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 3, self.block_size,"block_1.png"))
+            for obj in floor:
+                if obj.rect.x==k*self.block_size:
+                    floor.remove(obj)
+                  
+        for k in range(40,44,1):
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"block_1.png"))
+            for obj in floor:
+                if obj.rect.x==k*self.block_size:
+                    floor.remove(obj)
+           
+        for k in range(45,47,1):
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"block_1.png"))
+            for obj in floor:
+                if obj.rect.x==45*self.block_size:
+                    floor.remove(obj)       
+        platforms.append(Block(49 * self.block_size, HEIGHT - self.block_size * 8, self.block_size,"block_1.png"))
+        for i in range(49,51,1):
+            for obj in floor:
+                if obj.rect.x==i*self.block_size:
+                    floor.remove(obj)          
+        for k in range(51,53,1):
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 2, self.block_size,"block_1.png"))
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 6, self.block_size,"block_1.png"))           
+            for obj in floor:
+                if obj.rect.x==k*self.block_size:
+                    floor.remove(obj)                  
+        platforms.append(Block(50 * self.block_size, HEIGHT - self.block_size * 4, self.block_size,"block_1.png"))
+        for k in range(53,58):
+            platforms.append(Block(k * self.block_size, HEIGHT - self.block_size * 5, self.block_size,"block_1.png"))           
+            for obj in floor:
+                if obj.rect.x==k*self.block_size:
+                    floor.remove(obj)              
+
+        walls=[]
+        for k in range(0,HEIGHT//self.block_size+1):
+            for i in range(-6,0,1):
+                walls.append(Block(i * self.block_size, k*self.block_size, self.block_size,"wall_1.png"))
+        for k in range(0,HEIGHT//self.block_size+1):
+            for i in range((WIDTH*5)//self.block_size,((WIDTH*5)//self.block_size)+6,1):
+                walls.append(Block(i * self.block_size, k*self.block_size, self.block_size,"wall_1.png"))
+        objects = [*floor,*walls,*steps,*platforms,Block(200, HEIGHT - self.block_size * 2, self.block_size,"block_1.png"),Block(500, HEIGHT - self.block_size * 4, self.block_size,"block_1.png")]
+
+        #carrot distribution system
+        if difficulty==1:
+            chance=5
+        if difficulty==2:
+            chance=3
+        if difficulty==3:
+            chance=1      
+        for obj in floor:
+            if obj.rect.x>=self.x_distribution:
+                for step in steps:
+                    if obj.rect.x!=step.rect.x:
+                        height=obj.rect.y 
+                    else:
+                        for plat in platforms:
+                            if step.rect.x!=plat.rect.x:
+                                height=step.rect.y
+                            else:
+                                height=plat.rect.y
+                                break
+                        break   
+                carrot=Carrot(obj.rect.x+random.randint(0,self.block_size//3),height-32,65,65)
+                guess=random.randint(1,50)
+                if guess<=chance:  
+                    carrot_group.add(carrot)  
+        for obj in platforms:
+            for step in steps:
+                if step.rect.x!=obj.rect.x:
+                    chance1=chance
+                else:
+                    chance1=0
+                    break
+            carrot=Carrot(obj.rect.x+random.randint(0,self.block_size//3),obj.rect.y-32,65,65)
+            guess=random.randint(1,10)
+            if guess<=chance1:  
+                carrot_group.add(carrot)  
+        
+        #stationary enemies
+        dir=["bird1walking","bird2walking"]
+        ChillEnemy_group.add(ChillEnemy(12*block_size,HEIGHT-block_size*3-65,65,65,5,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(18*block_size,HEIGHT-block_size*5-65,65,65,2,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(40*block_size,HEIGHT-block_size*5-65,65,65,4,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(45*block_size,HEIGHT-block_size*5-65,65,65,2,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(51*block_size,HEIGHT-block_size*2-65,65,65,2,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(53*block_size,HEIGHT-block_size*5-65,65,65,5,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(27*block_size,HEIGHT-block_size*3-65,65,65,3,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(20*block_size,HEIGHT-block_size*1-65,65,65,5,dir[random.randint(0,1)]))
+        ChillEnemy_group.add(ChillEnemy(3*block_size,HEIGHT-block_size*1-65,65,65,8,dir[random.randint(0,1)]))
+        return objects
+    
+    def length(self):
+        length=WIDTH*5
+        return length
+
+
+
+
+
+
 
 class Back():
     def __init__(self):
@@ -835,7 +1005,7 @@ def main(window,level):
       level_chosen= Level1()
     elif level=="level2":
         level_xd.level_chosen="level2"
-        level_chosen=Level1()
+        level_chosen=Level2()
     difficulty=difficult()
     objects=level_chosen.objects(difficulty)
     run=True
